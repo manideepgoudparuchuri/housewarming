@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { blessing, event, hosts, invitation, schedule, title, venue } from './data'
 import {
   BrassBell,
-  BrassLamp,
   CornerOrnament,
   Diya,
   Ganesha,
@@ -235,37 +234,32 @@ function Intro({ onOpen, opening }) {
   )
 }
 
-function Countdown() {
-  const target = new Date(event.start).getTime()
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [])
-  const diff = Math.max(0, target - now)
-  if (diff === 0) {
-    return (
-      <p className="font-telugu text-xl text-gold-300">
-        శుభ ముహూర్తం వచ్చేసింది! <span className="font-serif">The auspicious day is here!</span>
-      </p>
-    )
-  }
-  const parts = [
-    [Math.floor(diff / 86400000), 'రోజులు', 'Days'],
-    [Math.floor(diff / 3600000) % 24, 'గంటలు', 'Hours'],
-    [Math.floor(diff / 60000) % 60, 'నిమిషాలు', 'Minutes'],
-    [Math.floor(diff / 1000) % 60, 'సెకన్లు', 'Seconds'],
-  ]
+function FamilyPhoto() {
   return (
-    <div className="grid grid-cols-4 gap-2 sm:gap-4">
-      {parts.map(([v, te, en]) => (
-        <div key={en} className="rounded-2xl border border-gold-500/40 bg-maroon-950/60 px-1 py-3 text-center">
-          <p className="font-serif text-3xl font-bold text-gold-400 lining-nums tabular-nums sm:text-5xl">{String(v).padStart(2, '0')}</p>
-          <p className="mt-1 font-telugu text-[11px] text-cream/80 sm:text-sm">{te}</p>
-          <p className="text-[10px] tracking-wider text-cream/60 uppercase sm:text-xs">{en}</p>
+    <figure className="relative mx-auto max-w-3xl">
+      <div className="pointer-events-none absolute -inset-6">
+        <Sparkles />
+      </div>
+      <div className="family-frame">
+        <div className="family-photo">
+          <img
+            src={`${import.meta.env.BASE_URL}family.jpg`}
+            alt="Illustrated portrait of the Paruchuri family"
+            width="1536"
+            height="1024"
+            loading="lazy"
+            className="family-img"
+          />
+          <div className="family-shine" />
+          <div className="curtain curtain-l" />
+          <div className="curtain curtain-r" />
         </div>
-      ))}
-    </div>
+      </div>
+      <figcaption className="mt-5 text-center">
+        <p className="font-telugu text-lg text-gold-300">పరుచూరి కుటుంబం</p>
+        <p className="font-script text-3xl text-cream/90">The Paruchuri Family</p>
+      </figcaption>
+    </figure>
   )
 }
 
@@ -308,7 +302,6 @@ export default function App() {
   const [playing, setPlaying] = useState(false)
   const [heroLit, setHeroLit] = useState(false)
   const [ringing, setRinging] = useState(null)
-  const [lampLit, setLampLit] = useState(0)
   const sound = useRef(null)
   useReveal()
   useParallax()
@@ -360,11 +353,6 @@ export default function App() {
     setTimeout(() => setRinging((r) => (r === side ? null : r)), 1600)
   }
 
-  const lightLamp = () => {
-    if (lampLit) return
-    if (playing) sound.current?.bell(0.5)
-    for (let i = 1; i <= 5; i++) setTimeout(() => setLampLit(i), i * 450)
-  }
 
   useEffect(() => {
     document.body.style.overflow = showIntro ? 'hidden' : ''
@@ -448,9 +436,6 @@ export default function App() {
                 <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">Nov 2026</p>
                 <p className="font-telugu text-sm text-cream/80 sm:text-base">నవంబర్ 2026</p>
               </div>
-            </div>
-            <div className="mt-8">
-              <Countdown />
             </div>
             <a
               href={calendarUrl()}
@@ -548,30 +533,19 @@ export default function App() {
 
         <TempleBorder className="mb-10 block w-full opacity-90" />
 
-        <footer className="reveal relative overflow-hidden px-5 pt-4 pb-24 text-center">
-          <div className="relative mx-auto h-80 w-80 sm:h-96 sm:w-96">
-            <Kolam className="absolute inset-0 h-full w-full opacity-60" />
-            <button
-              type="button"
-              onClick={lightLamp}
-              aria-label="Light the lamp"
-              className="absolute inset-x-0 top-[4%] mx-auto block h-[92%] w-[62%]"
-            >
-              <BrassLamp className="h-full w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)]" lit={lampLit} />
-            </button>
-            {lampLit === 5 && <Sparkles />}
+        {/* Family */}
+        <section className="reveal px-5 pb-12">
+          <SectionTitle te="మా కుటుంబం" en="Our Family" />
+          <FamilyPhoto />
+        </section>
+
+        <footer className="relative overflow-hidden px-5 pt-2 pb-24 text-center">
+          <div className="flex justify-center gap-6">
+            {[0, 0.4, 0.8].map((d) => (
+              <Diya key={d} className="h-12 w-12 sm:h-14 sm:w-14" delay={d} />
+            ))}
           </div>
-          {lampLit < 5 ? (
-            <p className="mt-2 text-sm text-gold-300/90">
-              <span className="font-telugu text-base">దీపం వెలిగించండి</span> · Tap the lamp to light it 🪔
-            </p>
-          ) : (
-            <p className="animate-fade-up mt-2 text-gold-300">
-              <span className="font-telugu text-xl">శుభమస్తు</span>
-              <span className="block text-sm text-cream/80">May this home be filled with light</span>
-            </p>
-          )}
-          <p className="mt-8 font-telugu text-xl text-gold-300 sm:text-2xl">మీ రాకకై ఎదురుచూస్తూ</p>
+          <p className="mt-6 font-telugu text-xl text-gold-300 sm:text-2xl">మీ రాకకై ఎదురుచూస్తూ</p>
           <p className="mt-1 font-script text-3xl text-cream/90 sm:text-4xl">Awaiting your gracious presence</p>
           <p className="mt-6 text-sm text-cream/50">With love, the Paruchuri family 🙏</p>
           <details className="mx-auto mt-8 max-w-md text-left text-xs text-cream/40">

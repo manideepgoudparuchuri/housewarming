@@ -41,8 +41,8 @@ export const hosts = {
     {
       labelTe: 'కుమార్తె & అల్లుడు',
       labelEn: 'Daughter & Son-in-law',
-      namesTe: ['పవిత్ర పరుచూరి', 'వెంకట హిమతేజ చిలక'],
-      namesEn: ['Pavithra Paruchuri', 'Venkata Himeteja Chilaka'],
+      namesTe: ['పవిత్ర పరుచూరి', 'వెంకట హిమతేజ చిలకా'],
+      namesEn: ['Pavithra Paruchuri', 'Venkata Himateja Chilaka'],
     },
   ],
 }

@@ -8,8 +8,8 @@ Animated, bilingual (Telugu + English) housewarming invitation for the Paruchuri
 - Brass-studded temple-door intro with a kolam drawing itself; tapping OPEN plays a conch, a temple bell and a nadaswaram burst, then a gentle looping veena
 - Silk-brocade background, gold-foil cards with temple corner ornaments, zari temple borders, parallax and gold sparkles
 - Lord Ganesha blessing, thoranam, tappable brass temple bells, marigold garlands, diyas that light up, kalash and falling petals
-- A brass lamp (kuthu vilakku) in the footer that guests tap to light
-- Live countdown and "Add to Google Calendar"
+- Illustrated family portrait in a gold arch frame, revealed by parting silk curtains
+- "Add to Google Calendar"
 - Programme timings, venue with Google Map and directions
 
 ## Editing details
