@@ -5,8 +5,10 @@ Animated, bilingual (Telugu + English) housewarming invitation for the Paruchuri
 **Live:** https://manideepgoudparuchuri.github.io/housewarming/
 
 ## Features
-- Temple-door intro that opens on tap (starts soft tanpura + flute background music)
-- Lord Ganesha blessing, thoranam, marigold garlands, diyas, kalash and falling petals
+- Brass-studded temple-door intro with a kolam drawing itself; tapping OPEN plays a conch, a temple bell and a nadaswaram burst, then a gentle looping veena
+- Silk-brocade background, gold-foil cards with temple corner ornaments, zari temple borders, parallax and gold sparkles
+- Lord Ganesha blessing, thoranam, tappable brass temple bells, marigold garlands, diyas that light up, kalash and falling petals
+- A brass lamp (kuthu vilakku) in the footer that guests tap to light
 - Live countdown and "Add to Google Calendar"
 - Programme timings, venue with Google Map and directions
 
@@ -14,6 +16,16 @@ Animated, bilingual (Telugu + English) housewarming invitation for the Paruchuri
 All text, timings and venue live in [`src/data.js`](src/data.js). Edit and push — the site redeploys automatically.
 
 The WhatsApp link preview image is `public/og-image.jpg` (1200×630).
+
+## Music credits
+Audio is in `public/audio/`, excerpted, trimmed and loudness-normalised from Wikimedia Commons recordings:
+
+| File | Source | Author | License |
+|------|--------|--------|---------|
+| `veena.mp3` | [Viriboni, rendered on the Veena](https://commons.wikimedia.org/wiki/File:Viriboni,_rendered_on_the_Veena.ogg) | Smt. Pushpa Srivatsan | CC0 |
+| `nadaswaram.mp3` | [Thakil & Nadaswaram during temple Deeparadhana](https://commons.wikimedia.org/wiki/File:Thakil_%26_Nadaswaram_during_temple_Deeparadhana.ogg) | Vis M | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `bell.mp3` | [ghanta-leather-mallet-2015-05-16](https://commons.wikimedia.org/wiki/File:274316_the-very-real-horst_ghanta-leather-mallet-2015-05-16.wav) | the_very_Real_Horst | CC0 |
+| `conch.mp3` | [Conch shell.ogg](https://commons.wikimedia.org/wiki/File:Conch_shell.ogg) | David Bolton | [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/) |
 
 ## Development
 ```bash

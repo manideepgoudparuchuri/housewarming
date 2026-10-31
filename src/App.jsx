@@ -1,7 +1,89 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { blessing, event, hosts, invitation, schedule, title, venue } from './data'
-import { Diya, Ganesha, Garland, Kalash, Marigold, Rangoli, Thoranam } from './decor'
-import { createMusic } from './music'
+import {
+  BrassBell,
+  BrassLamp,
+  CornerOrnament,
+  Diya,
+  Ganesha,
+  Garland,
+  Kalash,
+  Kolam,
+  Marigold,
+  Rangoli,
+  TempleBorder,
+  Thoranam,
+} from './decor'
+import { createSound } from './music'
+
+function useParallax() {
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let frame = 0
+    const onScroll = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => document.documentElement.style.setProperty('--sy', String(window.scrollY)))
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [])
+}
+
+const SPARKLES = [
+  [8, 22, 0],
+  [88, 18, 0.8],
+  [20, 48, 1.6],
+  [80, 44, 0.4],
+  [12, 70, 2.1],
+  [92, 66, 1.2],
+  [50, 10, 1.9],
+  [30, 84, 0.6],
+  [70, 88, 1.4],
+]
+
+function Sparkles({ items = SPARKLES }) {
+  return items.map(([x, y, d], i) => (
+    <span key={i} className="sparkle" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s`, scale: i % 3 ? '0.8' : '1.3' }} />
+  ))
+}
+
+function Burst() {
+  const pieces = useMemo(
+    () =>
+      Array.from({ length: 36 }, (_, i) => {
+        const a = (i / 36) * Math.PI * 2
+        const dist = 160 + (i % 4) * 70
+        return {
+          x: `${Math.cos(a) * dist}px`,
+          y: `${Math.sin(a) * dist}px`,
+          r: `${(i % 2 ? 1 : -1) * (200 + i * 15)}deg`,
+          size: 10 + (i % 3) * 5,
+          color: ['#f97316', '#fbbf24', '#ef4444', '#fde68a', '#ec4899', '#f59e0b'][i % 6],
+          delay: (i % 5) * 0.06,
+        }
+      }),
+    [],
+  )
+  return pieces.map((p, i) => (
+    <span
+      key={i}
+      className="burst-piece"
+      style={{
+        width: p.size,
+        height: p.size * 0.7,
+        background: `radial-gradient(circle at 30% 30%, #fff8, ${p.color})`,
+        borderRadius: '70% 0 70% 0',
+        animationDelay: `${p.delay}s`,
+        '--x': p.x,
+        '--y': p.y,
+        '--r': p.r,
+      }}
+    />
+  ))
+}
 
 function useReveal() {
   useEffect(() => {
@@ -72,11 +154,14 @@ function SectionTitle({ te, en }) {
 
 function Card({ children, className = '' }) {
   return (
-    <div
-      className={`relative rounded-3xl border border-gold-500/40 bg-gradient-to-b from-maroon-800/80 to-maroon-900/80 p-6 shadow-[0_0_40px_rgba(212,160,23,0.12)] backdrop-blur-sm sm:p-8 ${className}`}
-    >
-      <div className="pointer-events-none absolute inset-2 rounded-[1.25rem] border border-gold-500/20" />
-      {children}
+    <div className={`foil relative rounded-3xl p-7 shadow-[0_0_40px_rgba(212,160,23,0.15)] sm:p-9 ${className}`}>
+      <div className="pointer-events-none absolute inset-2 rounded-[1.25rem] border border-gold-500/25" />
+      <CornerOrnament className="pointer-events-none absolute top-1 left-1 h-10 w-10 sm:h-12 sm:w-12" />
+      <CornerOrnament className="pointer-events-none absolute top-1 right-1 h-10 w-10 sm:h-12 sm:w-12" style={{ transform: 'scaleX(-1)' }} />
+      <CornerOrnament className="pointer-events-none absolute bottom-1 left-1 h-10 w-10 sm:h-12 sm:w-12" style={{ transform: 'scaleY(-1)' }} />
+      <CornerOrnament className="pointer-events-none absolute right-1 bottom-1 h-10 w-10 sm:h-12 sm:w-12" style={{ transform: 'scale(-1)' }} />
+      <div className="foil-shine" />
+      <div className="relative">{children}</div>
     </div>
   )
 }
@@ -100,6 +185,7 @@ function Intro({ onOpen, opening }) {
             boxShadow: side === 'left' ? 'inset -8px 0 20px rgba(0,0,0,.5)' : 'inset 8px 0 20px rgba(0,0,0,.5)',
           }}
         >
+          <div className="door-studs absolute inset-0 opacity-70" />
           <div className="absolute inset-4 rounded-t-[50%_20%] border-4 border-gold-600/70 sm:inset-8" />
           <div className="absolute inset-x-8 top-1/4 bottom-1/4 border-2 border-gold-600/50 sm:inset-x-14" />
           <div className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 opacity-60">
@@ -115,11 +201,16 @@ function Intro({ onOpen, opening }) {
 
       <Thoranam className="absolute top-0 left-0 z-10 h-16 w-full sm:h-20" />
 
+      {opening && (
+        <div className="light-burst pointer-events-none absolute top-1/2 left-1/2 z-[5] -mt-[40vmax] -ml-[40vmax] h-[80vmax] w-[80vmax] rounded-full bg-[radial-gradient(circle,#fff8e7_0%,#fde68acc_20%,#f5c54255_45%,transparent_70%)]" />
+      )}
+
       <div
         className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center transition-opacity duration-500"
         style={{ opacity: opening ? 0 : 1 }}
       >
-        <div className="rounded-3xl bg-maroon-950/70 px-6 py-8 backdrop-blur-sm sm:px-10">
+        <Kolam className="is-drawn pointer-events-none absolute top-1/2 left-1/2 h-[min(118vw,560px)] w-[min(118vw,560px)] -translate-x-1/2 -translate-y-1/2 opacity-25" colored={false} />
+        <div className="relative rounded-3xl border border-gold-500/40 bg-maroon-950/75 px-6 py-8 shadow-2xl backdrop-blur-sm sm:px-10">
           <p className="font-telugu text-xl text-gold-300">{blessing.te}</p>
           <p className="mt-4 font-telugu text-3xl leading-snug sm:text-4xl">
             <span className="gold-text inline-block py-1">శుభ ఆహ్వానం</span>
@@ -132,13 +223,13 @@ function Intro({ onOpen, opening }) {
             <span className="absolute inset-0 -z-10 rounded-full bg-gold-400 animate-pulse-ring" />
             ద్వారం తెరవండి · OPEN
           </button>
-          <p className="mt-4 text-sm text-cream/60">Tap to open · with music 🎵</p>
+          <p className="mt-4 text-sm text-cream/60">Tap to open · with temple music 🎵</p>
         </div>
       </div>
       <div className="absolute bottom-6 left-0 z-10 flex w-full justify-center gap-6" style={{ opacity: opening ? 0 : 1 }}>
-        <Diya className="h-14 w-14" />
-        <Diya className="h-14 w-14" delay={0.4} />
-        <Diya className="h-14 w-14" delay={0.8} />
+        <Diya className="h-14 w-14" lightDelay={0.3} />
+        <Diya className="h-14 w-14" delay={0.4} lightDelay={0.7} />
+        <Diya className="h-14 w-14" delay={0.8} lightDelay={1.1} />
       </div>
     </div>
   )
@@ -198,7 +289,15 @@ function MusicButton({ playing, onToggle }) {
       className="fixed right-4 bottom-4 z-40 grid h-12 w-12 place-items-center rounded-full border border-gold-400/60 bg-maroon-900/90 text-xl text-gold-300 shadow-lg backdrop-blur"
     >
       {playing && <span className="absolute inset-0 rounded-full border border-gold-400 animate-pulse-ring" />}
-      {playing ? '🎵' : '🔇'}
+      {playing ? (
+        <span className="flex h-5 items-end gap-[3px]" aria-hidden="true">
+          {[0, 0.25, 0.5, 0.15].map((d) => (
+            <span key={d} className="eq-bar h-full w-[3px] rounded-full bg-gold-300" style={{ animationDelay: `${d}s` }} />
+          ))}
+        </span>
+      ) : (
+        '🔇'
+      )}
     </button>
   )
 }
@@ -207,27 +306,64 @@ export default function App() {
   const [opening, setOpening] = useState(false)
   const [showIntro, setShowIntro] = useState(true)
   const [playing, setPlaying] = useState(false)
-  const music = useRef(null)
+  const [heroLit, setHeroLit] = useState(false)
+  const [ringing, setRinging] = useState(null)
+  const [lampLit, setLampLit] = useState(0)
+  const sound = useRef(null)
   useReveal()
+  useParallax()
+
+  useEffect(() => {
+    try {
+      sound.current = createSound()
+    } catch {
+      sound.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const onVis = () => {
+      const s = sound.current
+      if (!s || !playing) return
+      if (document.hidden) s.mute()
+      else s.unmute()
+    }
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [playing])
 
   const open = () => {
-    try {
-      music.current = music.current || createMusic()
-      music.current.play()
+    if (sound.current) {
+      sound.current.open()
       setPlaying(true)
-    } catch {
-      setPlaying(false)
     }
     setOpening(true)
     setTimeout(() => setOpening('done'), 2400)
-    setTimeout(() => setShowIntro(false), 3400)
+    setTimeout(() => {
+      setShowIntro(false)
+      setHeroLit(true)
+    }, 3400)
   }
 
   const toggleMusic = () => {
-    music.current = music.current || createMusic()
-    if (playing) music.current.pause()
-    else music.current.play()
+    const s = sound.current
+    if (!s) return
+    if (playing) s.mute()
+    else s.unmute()
     setPlaying(!playing)
+  }
+
+  const ringBell = (side) => {
+    if (playing) sound.current?.bell(0.55)
+    setRinging(null)
+    requestAnimationFrame(() => setRinging(side))
+    setTimeout(() => setRinging((r) => (r === side ? null : r)), 1600)
+  }
+
+  const lightLamp = () => {
+    if (lampLit) return
+    if (playing) sound.current?.bell(0.5)
+    for (let i = 1; i <= 5; i++) setTimeout(() => setLampLit(i), i * 450)
   }
 
   useEffect(() => {
@@ -238,16 +374,22 @@ export default function App() {
     <>
       {showIntro && <Intro onOpen={open} opening={opening} />}
       {!showIntro || opening ? <Petals /> : null}
+      {opening && showIntro && <Burst />}
       {!showIntro && <MusicButton playing={playing} onToggle={toggleMusic} />}
 
       <main className="relative">
         {/* Hero */}
         <section className="relative overflow-hidden px-5 pt-20 pb-16 text-center sm:pt-24">
-          <Thoranam className="absolute top-0 left-0 h-16 w-full sm:h-20" />
+          <div className="pointer-events-none absolute inset-0 parallax" style={{ '--f': 0.35 }}>
+            <Sparkles />
+          </div>
+          <Thoranam className="absolute top-0 left-0 z-10 h-16 w-full sm:h-20" />
           <Garland className="absolute top-10 left-1 h-56 w-5 sm:left-6 sm:h-80 sm:w-7" />
           <Garland className="absolute top-10 right-1 h-56 w-5 sm:right-6 sm:h-80 sm:w-7" delay={0.8} />
+          <BrassBell className="absolute top-12 left-8 h-28 w-8 sm:left-20 sm:h-36 sm:w-10" ringing={ringing === 'l'} onClick={() => ringBell('l')} />
+          <BrassBell className="absolute top-12 right-8 h-28 w-8 sm:right-20 sm:h-36 sm:w-10" ringing={ringing === 'r'} onClick={() => ringBell('r')} />
 
-          <div className="relative mx-auto h-56 w-56 sm:h-72 sm:w-72">
+          <div className="parallax relative mx-auto h-56 w-56 sm:h-72 sm:w-72" style={{ '--f': 0.12 }}>
             <div className="absolute inset-0 rounded-full bg-gold-400/20 blur-2xl animate-halo" />
             <Rangoli className="absolute inset-0 h-full w-full opacity-70 animate-spin-slow" />
             <Ganesha className="absolute inset-[16%] h-[68%] w-[68%] drop-shadow-[0_0_18px_rgba(245,197,66,0.5)]" />
@@ -268,11 +410,13 @@ export default function App() {
           <p className="mt-2 font-display text-sm tracking-[0.3em] text-cream/80 uppercase sm:text-lg">{title.subEn}</p>
 
           <div className="mt-8 flex justify-center gap-4">
-            <Diya className="h-12 w-12 sm:h-16 sm:w-16" />
+            <Diya className="h-12 w-12 sm:h-16 sm:w-16" lit={heroLit} lightDelay={0.4} />
             <Kalash className="h-20 w-16 sm:h-28 sm:w-24" />
-            <Diya className="h-12 w-12 sm:h-16 sm:w-16" delay={0.5} />
+            <Diya className="h-12 w-12 sm:h-16 sm:w-16" delay={0.5} lit={heroLit} lightDelay={1} />
           </div>
         </section>
+
+        <TempleBorder className="mb-14 block w-full opacity-90" />
 
         {/* Invitation */}
         <section className="reveal px-5 pb-16">
@@ -385,15 +529,56 @@ export default function App() {
           </Card>
         </section>
 
-        <footer className="relative overflow-hidden px-5 pt-6 pb-24 text-center">
-          <div className="flex justify-center gap-3 sm:gap-5">
-            {[0, 0.3, 0.6, 0.9, 1.2].map((d) => (
-              <Diya key={d} className="h-12 w-12 sm:h-14 sm:w-14" delay={d} />
-            ))}
+        <TempleBorder className="mb-10 block w-full opacity-90" />
+
+        <footer className="reveal relative overflow-hidden px-5 pt-4 pb-24 text-center">
+          <div className="relative mx-auto h-80 w-80 sm:h-96 sm:w-96">
+            <Kolam className="absolute inset-0 h-full w-full opacity-60" />
+            <button
+              type="button"
+              onClick={lightLamp}
+              aria-label="Light the lamp"
+              className="absolute inset-x-0 top-[4%] mx-auto block h-[92%] w-[62%]"
+            >
+              <BrassLamp className="h-full w-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)]" lit={lampLit} />
+            </button>
+            {lampLit === 5 && <Sparkles />}
           </div>
-          <p className="mt-6 font-telugu text-xl text-gold-300 sm:text-2xl">మీ రాకకై ఎదురుచూస్తూ</p>
+          {lampLit < 5 ? (
+            <p className="mt-2 text-sm text-gold-300/90">
+              <span className="font-telugu text-base">దీపం వెలిగించండి</span> · Tap the lamp to light it 🪔
+            </p>
+          ) : (
+            <p className="animate-fade-up mt-2 text-gold-300">
+              <span className="font-telugu text-xl">శుభమస్తు</span>
+              <span className="block text-sm text-cream/80">May this home be filled with light</span>
+            </p>
+          )}
+          <p className="mt-8 font-telugu text-xl text-gold-300 sm:text-2xl">మీ రాకకై ఎదురుచూస్తూ</p>
           <p className="mt-1 font-script text-3xl text-cream/90 sm:text-4xl">Awaiting your gracious presence</p>
           <p className="mt-6 text-sm text-cream/50">With love, the Paruchuri family 🙏</p>
+          <details className="mx-auto mt-8 max-w-md text-left text-xs text-cream/40">
+            <summary className="cursor-pointer text-center">Music credits</summary>
+            <ul className="mt-2 space-y-1">
+              <li>Veena: &ldquo;Viriboni&rdquo; by Smt. Pushpa Srivatsan, CC0 (excerpt)</li>
+              <li>
+                Nadaswaram: &ldquo;Thakil &amp; Nadaswaram during temple Deeparadhana&rdquo; by Vis M,{' '}
+                <a className="underline" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
+                  CC BY 4.0
+                </a>{' '}
+                (excerpted, edited)
+              </li>
+              <li>Temple bell: ghanta recording by the_very_Real_Horst, CC0</li>
+              <li>
+                Conch: &ldquo;Conch shell&rdquo; by David Bolton,{' '}
+                <a className="underline" href="https://creativecommons.org/licenses/by/2.5/" target="_blank" rel="noreferrer">
+                  CC BY 2.5
+                </a>{' '}
+                (trimmed)
+              </li>
+              <li>All via Wikimedia Commons.</li>
+            </ul>
+          </details>
         </footer>
       </main>
     </>

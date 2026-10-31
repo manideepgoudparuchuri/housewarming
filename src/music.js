@@ -1,159 +1,111 @@
-// Gentle devotional ambience synthesized with the Web Audio API
-// (tanpura-style drone, bansuri-like melody in Raga Mohanam, temple bell).
-// Generated in the browser, so there are no audio files or copyright concerns.
+// Sound engine: conch + temple bell + nadaswaram burst when the doors open,
+// then a gentle looping veena. Short clips are decoded into Web Audio buffers
+// for precise timing; the long veena track streams from an <audio> element.
+// Recordings are CC0 / CC BY from Wikimedia Commons (see README for credits).
 
-const SA = 261.63 // C4
-const ratio = { S: 1, R: 9 / 8, G: 5 / 4, P: 3 / 2, D: 5 / 3, "S'": 2, "R'": 9 / 4, ',D': 5 / 6, ',P': 3 / 4 }
+const base = import.meta.env.BASE_URL + 'audio/'
+const CLIPS = ['conch', 'bell', 'nadaswaram']
+const VEENA_VOLUME = 0.65
 
-// [swara, beats]; '-' is a rest
-const phrase = [
-  ['P', 1.5], ['D', 0.5], ["S'", 2], ['D', 1], ['P', 1], ['G', 2], ['-', 1],
-  ['G', 1], ['P', 1], ['D', 1], ['P', 1], ['G', 1], ['R', 1], ['S', 2], ['-', 1],
-  ['R', 1], ['G', 1], ['P', 1.5], ['D', 0.5], ["S'", 1], ["R'", 1], ["S'", 2], ['-', 1],
-  ["S'", 1], ['D', 1], ['P', 1], ['G', 1], ['R', 1.5], ['G', 0.5], ['R', 1], ['S', 1], [',D', 1], ['S', 3], ['-', 2],
-]
-
-const BEAT = 60 / 66
-
-export function createMusic() {
+export function createSound() {
   const Ctx = window.AudioContext || window.webkitAudioContext
-  const ctx = new Ctx()
-  const master = ctx.createGain()
-  master.gain.value = 0
-  const comp = ctx.createDynamicsCompressor()
-  master.connect(comp).connect(ctx.destination)
-
-  // simple generated reverb
-  const reverb = ctx.createConvolver()
-  const len = ctx.sampleRate * 3.2
-  const impulse = ctx.createBuffer(2, len, ctx.sampleRate)
-  for (let c = 0; c < 2; c++) {
-    const d = impulse.getChannelData(c)
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6)
+  const ctx = Ctx ? new Ctx() : null
+  const master = ctx?.createGain()
+  if (master) {
+    master.gain.value = 1
+    master.connect(ctx.destination)
   }
-  reverb.buffer = impulse
-  const wet = ctx.createGain()
-  wet.gain.value = 0.45
-  reverb.connect(wet).connect(master)
 
-  const bus = ctx.createGain()
-  bus.connect(master)
-  bus.connect(reverb)
+  const buffers = {}
+  const ready = Promise.all(
+    CLIPS.map(async (name) => {
+      if (!ctx) return
+      try {
+        const res = await fetch(`${base}${name}.mp3`)
+        const data = await res.arrayBuffer()
+        buffers[name] = await new Promise((ok, fail) => ctx.decodeAudioData(data, ok, fail))
+      } catch {
+        /* sound is a nice-to-have */
+      }
+    }),
+  )
 
-  function tanpura(freq, t) {
+  const veena = new Audio(`${base}veena.mp3`)
+  veena.loop = true
+  veena.preload = 'auto'
+  veena.volume = 0
+
+  let muted = false
+  let fadeTimer = null
+  let veenaTimer = null
+  const active = new Set()
+
+  function fadeVeena(to, ms) {
+    clearInterval(fadeTimer)
+    const from = veena.volume
+    const start = performance.now()
+    fadeTimer = setInterval(() => {
+      const k = Math.min(1, (performance.now() - start) / ms)
+      veena.volume = from + (to - from) * k
+      if (k === 1) clearInterval(fadeTimer)
+    }, 50)
+  }
+
+  function playClip(name, delay = 0, gain = 1) {
+    if (!ctx || muted || !buffers[name]) return
+    const src = ctx.createBufferSource()
+    src.buffer = buffers[name]
     const g = ctx.createGain()
-    g.gain.setValueAtTime(0, t)
-    g.gain.linearRampToValueAtTime(0.05, t + 0.08)
-    g.gain.exponentialRampToValueAtTime(0.0008, t + 4.2)
-    g.connect(bus)
-    ;[1, 2, 3, 4, 5, 6].forEach((h, i) => {
-      const o = ctx.createOscillator()
-      o.frequency.value = freq * h * (1 + (Math.random() - 0.5) * 0.002)
-      const hg = ctx.createGain()
-      hg.gain.value = [1, 0.6, 0.5, 0.35, 0.25, 0.15][i]
-      o.connect(hg).connect(g)
-      o.start(t)
-      o.stop(t + 4.3)
-    })
+    g.gain.value = gain
+    src.connect(g).connect(master)
+    src.start(ctx.currentTime + delay)
+    active.add(src)
+    src.onended = () => active.delete(src)
   }
 
-  function flute(freq, t, dur) {
-    const o = ctx.createOscillator()
-    o.type = 'sine'
-    o.frequency.value = freq
-    const o2 = ctx.createOscillator()
-    o2.type = 'triangle'
-    o2.frequency.value = freq * 2
-    const o2g = ctx.createGain()
-    o2g.gain.value = 0.08
-    const vib = ctx.createOscillator()
-    vib.frequency.value = 5
-    const vibG = ctx.createGain()
-    vibG.gain.setValueAtTime(0, t)
-    vibG.gain.linearRampToValueAtTime(freq * 0.006, t + Math.min(dur, 0.6))
-    vib.connect(vibG).connect(o.frequency)
-    const g = ctx.createGain()
-    const end = t + dur
-    g.gain.setValueAtTime(0, t)
-    g.gain.linearRampToValueAtTime(0.11, t + 0.12)
-    g.gain.setValueAtTime(0.1, Math.max(t + 0.12, end - 0.15))
-    g.gain.linearRampToValueAtTime(0, end + 0.25)
-    o.connect(g)
-    o2.connect(o2g).connect(g)
-    g.connect(bus)
-    ;[o, o2, vib].forEach((n) => {
-      n.start(t)
-      n.stop(end + 0.3)
-    })
-  }
-
-  function bell(t) {
-    const base = SA * 2
-    ;[[1, 0.06], [2.76, 0.03], [5.4, 0.018], [8.93, 0.01]].forEach(([m, a]) => {
-      const o = ctx.createOscillator()
-      o.frequency.value = base * m
-      const g = ctx.createGain()
-      g.gain.setValueAtTime(a, t)
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 5)
-      o.connect(g).connect(bus)
-      o.start(t)
-      o.stop(t + 5.1)
-    })
-  }
-
-  const dronePattern = [SA * 0.75, SA, SA, SA * 0.5]
-  let nextDrone = 0
-  let droneIdx = 0
-  let nextNote = 0
-  let noteIdx = 0
-  let nextBell = 0
-  let timer = null
-
-  function schedule() {
-    const horizon = ctx.currentTime + 0.6
-    while (nextDrone < horizon) {
-      tanpura(dronePattern[droneIdx % 4] / 2, nextDrone)
-      droneIdx++
-      nextDrone += 1.05
-    }
-    while (nextNote < horizon) {
-      const [sw, beats] = phrase[noteIdx % phrase.length]
-      const dur = beats * BEAT
-      if (sw !== '-') flute(SA * ratio[sw], nextNote, dur * 0.95)
-      noteIdx++
-      nextNote += dur
-    }
-    while (nextBell < horizon) {
-      bell(nextBell)
-      nextBell += 17
-    }
+  function startVeena() {
+    if (muted) return
+    veena.play().then(() => fadeVeena(VEENA_VOLUME, 4000)).catch(() => {})
   }
 
   return {
-    async play() {
-      await ctx.resume()
-      const now = ctx.currentTime
-      if (!timer) {
-        nextDrone = now + 0.05
-        nextNote = Math.max(nextNote, now + 2.2)
-        nextBell = Math.max(nextBell, now + 0.1)
-        timer = setInterval(schedule, 150)
-        schedule()
-      }
-      master.gain.cancelScheduledValues(now)
-      master.gain.setValueAtTime(master.gain.value, now)
-      master.gain.linearRampToValueAtTime(0.55, now + 2.5)
+    // Must be called from a user gesture (tap) so mobile browsers allow audio.
+    async open() {
+      ctx?.resume()
+      // unlock the <audio> element inside the gesture so it can start later
+      veena.play().then(() => veena.pause()).catch(() => {})
+      await Promise.race([ready, new Promise((r) => setTimeout(r, 1500))])
+      playClip('conch', 0, 0.9)
+      playClip('bell', 0.5, 0.7)
+      playClip('nadaswaram', 2.2, 0.85)
+      const nadaLen = buffers.nadaswaram ? buffers.nadaswaram.duration : 0
+      veenaTimer = setTimeout(startVeena, (2.2 + Math.max(0, nadaLen - 4)) * 1000)
     },
-    pause() {
-      const now = ctx.currentTime
-      master.gain.cancelScheduledValues(now)
-      master.gain.setValueAtTime(master.gain.value, now)
-      master.gain.linearRampToValueAtTime(0, now + 0.6)
-      setTimeout(() => {
-        clearInterval(timer)
-        timer = null
-        ctx.suspend()
-      }, 700)
+    bell(gain = 0.6) {
+      ctx?.resume()
+      playClip('bell', 0, gain)
+    },
+    get muted() {
+      return muted
+    },
+    mute() {
+      muted = true
+      clearTimeout(veenaTimer)
+      active.forEach((s) => {
+        try {
+          s.stop()
+        } catch {
+          /* already stopped */
+        }
+      })
+      fadeVeena(0, 500)
+      setTimeout(() => veena.pause(), 550)
+    },
+    unmute() {
+      muted = false
+      ctx?.resume()
+      veena.volume = 0
+      startVeena()
     },
   }
 }
