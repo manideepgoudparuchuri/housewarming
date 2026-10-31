@@ -29,12 +29,22 @@ export const invitation = {
 export const hosts = {
   labelTe: 'ఆహ్వానించువారు',
   labelEn: 'Invited by',
-  namesTe: 'శ్రీమతి పద్మ & శ్రీ మాలకొండయ్య పరుచూరి',
-  namesEn: 'Smt. Padma & Sri Malakondaiah Paruchuri',
-  sonLabelTe: 'కుమారుడు',
-  sonLabelEn: 'Son',
-  sonTe: 'మణిదీప్ గౌడ్ పరుచూరి',
-  sonEn: 'Manideep Goud Paruchuri',
+  namesTe: 'శ్రీమతి పద్మ & శ్రీ మాలకొండయ్య గౌడ్ పరుచూరి',
+  namesEn: 'Smt. Padma & Sri Malakondaiah Goud Paruchuri',
+  family: [
+    {
+      labelTe: 'కుమారుడు',
+      labelEn: 'Son',
+      namesTe: ['మణిదీప్ గౌడ్ పరుచూరి'],
+      namesEn: ['Manideep Goud Paruchuri'],
+    },
+    {
+      labelTe: 'కుమార్తె & అల్లుడు',
+      labelEn: 'Daughter & Son-in-law',
+      namesTe: ['పవిత్ర పరుచూరి', 'వెంకట హిమతేజ చిలక'],
+      namesEn: ['Pavithra Paruchuri', 'Venkata Himeteja Chilaka'],
+    },
+  ],
 }
 
 export const schedule = [
@@ -49,6 +59,12 @@ export const schedule = [
     icon: '🔥',
     te: 'పూజ & హోమం',
     en: 'Puja & Homam',
+  },
+  {
+    time: '11:30 AM',
+    icon: '🌺',
+    te: 'శ్రీ సత్యనారాయణ స్వామి వ్రతం',
+    en: 'Sri Satyanarayana Swamy Vratham',
   },
   {
     time: '12:30 PM',

@@ -275,7 +275,7 @@ function calendarUrl() {
     action: 'TEMPLATE',
     text: 'Gruhapravesam (Housewarming) - Paruchuri Family',
     dates: `${fmt(event.start)}/${fmt(event.end)}`,
-    details: `Muhurtham 5:30 AM, Puja & Homam 7:30 AM, Lunch 12:30 PM.\nMaps: ${venue.mapsLink}`,
+    details: `${schedule.map((s) => `${s.en} ${s.time}`).join(', ')}.\nMaps: ${venue.mapsLink}`,
     location: venue.en,
   })
   return `https://calendar.google.com/calendar/render?${params}`
@@ -467,7 +467,7 @@ export default function App() {
         {/* Schedule */}
         <section className="reveal px-5 pb-16">
           <SectionTitle te="కార్యక్రమ వివరాలు" en="Programme" />
-          <div className="mx-auto grid max-w-4xl gap-5 sm:grid-cols-3">
+          <div className="mx-auto grid max-w-4xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {schedule.map((s) => (
               <Card key={s.en} className="text-center">
                 <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-gold-500/50 bg-maroon-950/60 text-3xl">
@@ -512,20 +512,37 @@ export default function App() {
         <section className="reveal px-5 pb-16">
           <SectionTitle te={hosts.labelTe} en={hosts.labelEn} />
           <Card className="mx-auto max-w-2xl text-center">
-            <p className="font-telugu text-2xl leading-relaxed sm:text-3xl">
-              <span className="gold-text inline-block py-1">{hosts.namesTe}</span>
+            <p className="font-telugu text-xl leading-relaxed sm:text-3xl">
+              {hosts.namesTe.split(' & ').map((n, i) => (
+                <span key={n} className="gold-text block py-1">
+                  {i ? `& ${n}` : n}
+                </span>
+              ))}
             </p>
-            <p className="mt-2 font-script text-3xl text-gold-300 sm:text-4xl">{hosts.namesEn}</p>
+            <p className="mt-2 font-script text-[1.7rem] leading-snug text-gold-300 sm:text-4xl">
+              {hosts.namesEn.split(' & ').map((n, i) => (
+                <span key={n} className="block">
+                  {i ? `& ${n}` : n}
+                </span>
+              ))}
+            </p>
             <div className="my-6 flex items-center justify-center gap-3">
               <span className="h-px w-12 bg-gold-500/60" />
               <span className="text-gold-400">❁</span>
               <span className="h-px w-12 bg-gold-500/60" />
             </div>
-            <p className="text-sm text-cream/60">
-              <span className="font-telugu text-base">{hosts.sonLabelTe}</span> · <span className="tracking-widest uppercase">{hosts.sonLabelEn}</span>
-            </p>
-            <p className="mt-2 font-telugu text-xl text-cream sm:text-2xl">{hosts.sonTe}</p>
-            <p className="mt-1 font-script text-3xl text-gold-300">{hosts.sonEn}</p>
+            {hosts.family.map((f, i) => (
+              <div key={f.labelEn} className={i ? 'mt-8' : ''}>
+                <p className="font-telugu text-base text-gold-300/90">{f.labelTe}</p>
+                <p className="text-xs tracking-widest text-cream/60 uppercase">{f.labelEn}</p>
+                {f.namesTe.map((te, j) => (
+                  <div key={te} className={j ? 'mt-3' : ''}>
+                    <p className="mt-2 font-telugu text-xl text-cream sm:text-2xl">{te}</p>
+                    <p className="mt-1 font-script text-3xl text-gold-300">{f.namesEn[j]}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
           </Card>
         </section>
 
