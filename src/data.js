@@ -66,7 +66,3 @@ export const venue = {
   lng: 78.579952,
 }
 
-export const rsvp = {
-  whatsapp: '919154861747',
-  display: '+91 91548 61747',
-}

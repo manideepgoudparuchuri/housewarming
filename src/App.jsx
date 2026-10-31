@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { blessing, event, hosts, invitation, rsvp, schedule, title, venue } from './data'
+import { blessing, event, hosts, invitation, schedule, title, venue } from './data'
 import { Diya, Ganesha, Garland, Kalash, Marigold, Rangoli, Thoranam } from './decor'
 import { createMusic } from './music'
 
@@ -188,82 +188,6 @@ function calendarUrl() {
     location: venue.en,
   })
   return `https://calendar.google.com/calendar/render?${params}`
-}
-
-function Rsvp() {
-  const [name, setName] = useState('')
-  const [guests, setGuests] = useState(2)
-
-  const send = (attending) => {
-    const who = name.trim() || 'We'
-    const msg = attending
-      ? `🙏 Namaste! ${who} will happily attend the Gruhapravesam on 20 Nov 2026 with ${guests} ${guests === 1 ? 'guest' : 'guests'} in total. Congratulations! 🏡🪔`
-      : `🙏 Namaste! ${who} won't be able to attend the Gruhapravesam on 20 Nov 2026, but sending our blessings and best wishes for the new home! 🏡🪔`
-    window.open(`https://wa.me/${rsvp.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank')
-  }
-
-  return (
-    <Card className="mx-auto max-w-xl text-center">
-      <label className="block text-left">
-        <span className="font-telugu text-sm text-gold-300">మీ పేరు</span>
-        <span className="text-sm text-cream/70"> · Your name</span>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Ravi & Family"
-          className="mt-2 w-full rounded-xl border border-gold-500/40 bg-maroon-950/70 px-4 py-3 text-lg text-cream placeholder:text-cream/40 focus:border-gold-400 focus:outline-none"
-        />
-      </label>
-      <div className="mt-5 flex items-center justify-between gap-4 text-left">
-        <div>
-          <span className="font-telugu text-sm text-gold-300">అతిథుల సంఖ్య</span>
-          <span className="block text-sm text-cream/70">Number of guests</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setGuests((g) => Math.max(1, g - 1))}
-            className="h-10 w-10 rounded-full border border-gold-500/60 text-xl text-gold-300"
-            aria-label="Fewer guests"
-          >
-            −
-          </button>
-          <span className="w-8 text-center font-serif text-3xl font-bold text-gold-400 lining-nums tabular-nums">{guests}</span>
-          <button
-            onClick={() => setGuests((g) => Math.min(20, g + 1))}
-            className="h-10 w-10 rounded-full border border-gold-500/60 text-xl text-gold-300"
-            aria-label="More guests"
-          >
-            +
-          </button>
-        </div>
-      </div>
-      <button
-        onClick={() => send(true)}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-600 to-emerald-500 px-5 py-3.5 font-bold text-white shadow-lg shadow-green-900/40 transition hover:scale-[1.02]"
-      >
-        <WhatsAppIcon />
-        <span className="flex flex-col leading-tight sm:flex-row sm:gap-2">
-          <span className="font-telugu text-lg">తప్పకుండా వస్తాం</span>
-          <span className="text-base font-semibold opacity-90">We&apos;ll be there</span>
-        </span>
-      </button>
-      <button
-        onClick={() => send(false)}
-        className="mt-3 w-full rounded-full border border-cream/30 px-6 py-3 text-cream/80 transition hover:border-gold-400"
-      >
-        రాలేకపోతున్నాం · Sorry, can&apos;t make it
-      </button>
-      <p className="mt-4 text-sm text-cream/60">Opens WhatsApp to send your reply to <span className="whitespace-nowrap">{rsvp.display}</span></p>
-    </Card>
-  )
-}
-
-function WhatsAppIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
-      <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3M12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4C2.7 15.6 2.2 13.8 2.2 12 2.2 6.6 6.6 2.2 12 2.2c2.6 0 5.1 1 6.9 2.9 1.8 1.8 2.9 4.3 2.9 6.9 0 5.4-4.4 9.8-9.8 9.8M20.5 3.5C18.2 1.2 15.2 0 12 0 5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.8 1 3.8 1.5 5.8 1.5 6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.4" />
-    </svg>
-  )
 }
 
 function MusicButton({ playing, onToggle }) {
@@ -459,12 +383,6 @@ export default function App() {
             <p className="mt-2 font-telugu text-xl text-cream sm:text-2xl">{hosts.sonTe}</p>
             <p className="mt-1 font-script text-3xl text-gold-300">{hosts.sonEn}</p>
           </Card>
-        </section>
-
-        {/* RSVP */}
-        <section className="reveal px-5 pb-20">
-          <SectionTitle te="మీ రాకను తెలియజేయండి" en="Kindly RSVP" />
-          <Rsvp />
         </section>
 
         <footer className="relative overflow-hidden px-5 pt-6 pb-24 text-center">
