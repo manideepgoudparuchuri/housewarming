@@ -41,7 +41,7 @@ export const schedule = [
   {
     time: '12:30 PM',
     icon: '🍛',
-    te: 'విందు భోజనం',
+    te: 'భోజనం',
     en: 'Lunch',
   },
 ]
