@@ -51,6 +51,7 @@ await sleep(2000)
 await evaluate('window.__ready')
 await sleep(1500)
 const duration = await evaluate('window.__duration')
+const closingBell = await evaluate('window.__closingBell')
 const total = preview ? 0 : Math.round(duration * fps)
 const shots = preview ? [1, 3.5, 7, 9, 15, 22, 30, 37, 45, 52, 55] : null
 
@@ -83,7 +84,7 @@ if (!preview) {
     '[2]aformat=channel_layouts=stereo,adelay=900:all=1,volume=0.7[bell1]',
     '[3]aformat=channel_layouts=stereo,adelay=2700:all=1,volume=0.9[nada]',
     `[4]aformat=channel_layouts=stereo,atrim=0:${duration},afade=t=in:d=4,adelay=19000:all=1,volume=0.85[veena]`,
-    '[5]aformat=channel_layouts=stereo,adelay=48600:all=1,volume=0.45[bell2]',
+    `[5]aformat=channel_layouts=stereo,adelay=${Math.round(closingBell * 1000)}:all=1,volume=0.45[bell2]`,
     `[conch][bell1][nada][veena][bell2]amix=inputs=5:normalize=0:duration=longest,atrim=0:${duration},afade=t=out:st=${fade}:d=3.5[aout]`,
   ].join(';')
   const out = path.join(outDir, 'gruhapravesam-invitation.mp4')

@@ -1,4 +1,5 @@
 import { blessing, event, hosts, invitation, schedule, title, venue } from '../data'
+import { GruhaScene } from '../scene'
 import { BrassLamp, CornerOrnament, Diya, Ganesha, Garland, Kalash, Kolam, Marigold, Rangoli, TempleBorder, Thoranam } from '../decor'
 
 // 540x960 CSS px stage, captured at 2x => 1080x1920 portrait video.
@@ -10,10 +11,12 @@ const SCENES = {
   date: [18, 24.5],
   programme: [24.5, 33.5],
   venue: [33.5, 40],
-  family: [40, 47.5],
-  closing: [47.5, 99],
+  entry: [40, 49.5],
+  family: [49.5, 57],
+  closing: [57, 99],
 }
-export const DURATION = 56
+export const DURATION = 65.5
+export const CLOSING_BELL = SCENES.closing[0] + 1.1
 
 const anim = (name, dur, at, extra = '') => ({ animation: `${name} ${dur}s ${at}s ${extra} both` })
 
@@ -260,6 +263,21 @@ export default function Video() {
             📍 Map link in the message
           </Rise>
         </Frame>
+      </Scene>
+
+      <Scene id="entry">
+        <Heading te="శుభ గృహప్రవేశం" en="Auspicious Entry" at={SCENES.entry[0] + 0.2} />
+        <Divider at={SCENES.entry[0] + 0.5} />
+        {/* data-t0: main.jsx offsets this scene's own CSS animations to start here */}
+        <div className="scene-frame w-full" style={anim('v-zoom', 0.9, SCENES.entry[0] + 0.6, 'cubic-bezier(.2,.7,.3,1)')}>
+          <div className="is-visible" data-t0={SCENES.entry[0] + 0.8}>
+            <GruhaScene className="block h-auto w-full rounded-[16px]" />
+          </div>
+        </div>
+        <Rise at={SCENES.entry[0] + 1.6} className="mt-6">
+          <p className="font-telugu text-xl text-gold-300">గోమాత ఆశీస్సులతో నూతన గృహప్రవేశం</p>
+          <p className="mt-1 font-script text-3xl leading-snug text-cream/90">With Gomata&rsquo;s blessings, we step into our new home</p>
+        </Rise>
       </Scene>
 
       <Scene id="family">

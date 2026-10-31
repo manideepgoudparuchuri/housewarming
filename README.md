@@ -101,7 +101,7 @@ npm run video              # full video → video-out/gruhapravesam-invitation.m
 open video-out             # opens the folder in Finder
 ```
 
-1080×1920, about 56 seconds, ~11 MB — fits in WhatsApp. To open the video design in a browser while editing: `npm run dev`, then go to http://localhost:5173/housewarming/video.html.
+1080×1920, about 65 seconds, ~11 MB — fits in WhatsApp. To open the video design in a browser while editing: `npm run dev`, then go to http://localhost:5173/housewarming/video.html.
 
 ## 5. (Only if the DATE or place changed) Update the link-preview picture
 
