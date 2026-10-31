@@ -1,0 +1,483 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { blessing, event, hosts, invitation, rsvp, schedule, title, venue } from './data'
+import { Diya, Ganesha, Garland, Kalash, Marigold, Rangoli, Thoranam } from './decor'
+import { createMusic } from './music'
+
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal')
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible')
+            io.unobserve(e.target)
+          }
+        }),
+      { threshold: 0.15 },
+    )
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+}
+
+function Petals({ count = 16 }) {
+  const petals = useMemo(
+    () =>
+      Array.from({ length: count }, (_, i) => ({
+        left: Math.random() * 100,
+        size: 10 + Math.random() * 12,
+        duration: 9 + Math.random() * 9,
+        delay: -Math.random() * 18,
+        drift: (Math.random() - 0.5) * 160,
+        spin: 360 + Math.random() * 540,
+        color: ['#f97316', '#fbbf24', '#ef4444', '#f59e0b', '#ec4899'][i % 5],
+      })),
+    [count],
+  )
+  return petals.map((p, i) => (
+    <span
+      key={i}
+      className="petal"
+      style={{
+        left: `${p.left}vw`,
+        width: p.size,
+        height: p.size * 0.7,
+        background: `radial-gradient(circle at 30% 30%, #fff7, ${p.color})`,
+        borderRadius: '70% 0 70% 0',
+        animationDuration: `${p.duration}s`,
+        animationDelay: `${p.delay}s`,
+        '--drift': `${p.drift}px`,
+        '--spin': `${p.spin}deg`,
+      }}
+    />
+  ))
+}
+
+function SectionTitle({ te, en }) {
+  return (
+    <div className="mb-8 text-center">
+      <p className="font-telugu text-2xl text-gold-400 sm:text-3xl">{te}</p>
+      <p className="mt-1 font-display text-sm tracking-[0.25em] text-gold-300/80 uppercase sm:text-base">{en}</p>
+      <div className="mx-auto mt-4 flex items-center justify-center gap-3">
+        <span className="h-px w-16 bg-gradient-to-r from-transparent to-gold-500" />
+        <svg viewBox="-12 -12 24 24" className="h-5 w-5">
+          <Marigold r={10} />
+        </svg>
+        <span className="h-px w-16 bg-gradient-to-l from-transparent to-gold-500" />
+      </div>
+    </div>
+  )
+}
+
+function Card({ children, className = '' }) {
+  return (
+    <div
+      className={`relative rounded-3xl border border-gold-500/40 bg-gradient-to-b from-maroon-800/80 to-maroon-900/80 p-6 shadow-[0_0_40px_rgba(212,160,23,0.12)] backdrop-blur-sm sm:p-8 ${className}`}
+    >
+      <div className="pointer-events-none absolute inset-2 rounded-[1.25rem] border border-gold-500/20" />
+      {children}
+    </div>
+  )
+}
+
+function Intro({ onOpen, opening }) {
+  return (
+    <div
+      className={`door-stage fixed inset-0 z-50 overflow-hidden transition-opacity duration-1000 ${
+        opening ? 'doors-open pointer-events-none' : ''
+      }`}
+      style={{ opacity: opening === 'done' ? 0 : 1 }}
+    >
+      <div className="absolute inset-0 bg-maroon-950" style={{ opacity: opening ? 0 : 1, transition: 'opacity 1.6s 0.6s' }} />
+      {['left', 'right'].map((side) => (
+        <div
+          key={side}
+          className={`door door-${side} absolute top-0 h-full w-1/2 ${side === 'left' ? 'left-0' : 'right-0'}`}
+          style={{
+            background:
+              'repeating-linear-gradient(90deg, #5a2d0c 0 6px, #6b3510 6px 14px, #4a240a 14px 18px), linear-gradient(#6b3510, #3b1d07)',
+            boxShadow: side === 'left' ? 'inset -8px 0 20px rgba(0,0,0,.5)' : 'inset 8px 0 20px rgba(0,0,0,.5)',
+          }}
+        >
+          <div className="absolute inset-4 rounded-t-[50%_20%] border-4 border-gold-600/70 sm:inset-8" />
+          <div className="absolute inset-x-8 top-1/4 bottom-1/4 border-2 border-gold-600/50 sm:inset-x-14" />
+          <div className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 opacity-60">
+            <Rangoli className="h-full w-full" />
+          </div>
+          <div
+            className={`absolute top-1/2 h-14 w-3 -translate-y-1/2 rounded-full bg-gradient-to-b from-gold-300 to-gold-600 shadow ${
+              side === 'left' ? 'right-4' : 'left-4'
+            }`}
+          />
+        </div>
+      ))}
+
+      <Thoranam className="absolute top-0 left-0 z-10 h-16 w-full sm:h-20" />
+
+      <div
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center transition-opacity duration-500"
+        style={{ opacity: opening ? 0 : 1 }}
+      >
+        <div className="rounded-3xl bg-maroon-950/70 px-6 py-8 backdrop-blur-sm sm:px-10">
+          <p className="font-telugu text-xl text-gold-300">{blessing.te}</p>
+          <p className="mt-4 font-telugu text-3xl leading-snug sm:text-4xl">
+            <span className="gold-text inline-block py-1">శుభ ఆహ్వానం</span>
+          </p>
+          <p className="mt-1 font-script text-4xl text-gold-300 sm:text-5xl">You&apos;re Invited</p>
+          <button
+            onClick={onOpen}
+            className="relative mt-8 rounded-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 px-8 py-3 font-display text-sm font-bold tracking-widest text-maroon-950 shadow-lg shadow-gold-500/30"
+          >
+            <span className="absolute inset-0 -z-10 rounded-full bg-gold-400 animate-pulse-ring" />
+            ద్వారం తెరవండి · OPEN
+          </button>
+          <p className="mt-4 text-sm text-cream/60">Tap to open · with music 🎵</p>
+        </div>
+      </div>
+      <div className="absolute bottom-6 left-0 z-10 flex w-full justify-center gap-6" style={{ opacity: opening ? 0 : 1 }}>
+        <Diya className="h-14 w-14" />
+        <Diya className="h-14 w-14" delay={0.4} />
+        <Diya className="h-14 w-14" delay={0.8} />
+      </div>
+    </div>
+  )
+}
+
+function Countdown() {
+  const target = new Date(event.start).getTime()
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  const diff = Math.max(0, target - now)
+  if (diff === 0) {
+    return (
+      <p className="font-telugu text-xl text-gold-300">
+        శుభ ముహూర్తం వచ్చేసింది! <span className="font-serif">The auspicious day is here!</span>
+      </p>
+    )
+  }
+  const parts = [
+    [Math.floor(diff / 86400000), 'రోజులు', 'Days'],
+    [Math.floor(diff / 3600000) % 24, 'గంటలు', 'Hours'],
+    [Math.floor(diff / 60000) % 60, 'నిమిషాలు', 'Minutes'],
+    [Math.floor(diff / 1000) % 60, 'సెకన్లు', 'Seconds'],
+  ]
+  return (
+    <div className="grid grid-cols-4 gap-2 sm:gap-4">
+      {parts.map(([v, te, en]) => (
+        <div key={en} className="rounded-2xl border border-gold-500/40 bg-maroon-950/60 px-1 py-3 text-center">
+          <p className="font-serif text-3xl font-bold text-gold-400 lining-nums tabular-nums sm:text-5xl">{String(v).padStart(2, '0')}</p>
+          <p className="mt-1 font-telugu text-[11px] text-cream/80 sm:text-sm">{te}</p>
+          <p className="text-[10px] tracking-wider text-cream/60 uppercase sm:text-xs">{en}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function calendarUrl() {
+  const fmt = (iso) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: 'Gruhapravesam (Housewarming) - Paruchuri Family',
+    dates: `${fmt(event.start)}/${fmt(event.end)}`,
+    details: `Muhurtham 5:30 AM, Puja & Homam 7:30 AM, Lunch 12:30 PM.\nMaps: ${venue.mapsLink}`,
+    location: venue.en,
+  })
+  return `https://calendar.google.com/calendar/render?${params}`
+}
+
+function Rsvp() {
+  const [name, setName] = useState('')
+  const [guests, setGuests] = useState(2)
+
+  const send = (attending) => {
+    const who = name.trim() || 'We'
+    const msg = attending
+      ? `🙏 Namaste! ${who} will happily attend the Gruhapravesam on 20 Nov 2026 with ${guests} ${guests === 1 ? 'guest' : 'guests'} in total. Congratulations! 🏡🪔`
+      : `🙏 Namaste! ${who} won't be able to attend the Gruhapravesam on 20 Nov 2026, but sending our blessings and best wishes for the new home! 🏡🪔`
+    window.open(`https://wa.me/${rsvp.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank')
+  }
+
+  return (
+    <Card className="mx-auto max-w-xl text-center">
+      <label className="block text-left">
+        <span className="font-telugu text-sm text-gold-300">మీ పేరు</span>
+        <span className="text-sm text-cream/70"> · Your name</span>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Ravi & Family"
+          className="mt-2 w-full rounded-xl border border-gold-500/40 bg-maroon-950/70 px-4 py-3 text-lg text-cream placeholder:text-cream/40 focus:border-gold-400 focus:outline-none"
+        />
+      </label>
+      <div className="mt-5 flex items-center justify-between gap-4 text-left">
+        <div>
+          <span className="font-telugu text-sm text-gold-300">అతిథుల సంఖ్య</span>
+          <span className="block text-sm text-cream/70">Number of guests</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setGuests((g) => Math.max(1, g - 1))}
+            className="h-10 w-10 rounded-full border border-gold-500/60 text-xl text-gold-300"
+            aria-label="Fewer guests"
+          >
+            −
+          </button>
+          <span className="w-8 text-center font-serif text-3xl font-bold text-gold-400 lining-nums tabular-nums">{guests}</span>
+          <button
+            onClick={() => setGuests((g) => Math.min(20, g + 1))}
+            className="h-10 w-10 rounded-full border border-gold-500/60 text-xl text-gold-300"
+            aria-label="More guests"
+          >
+            +
+          </button>
+        </div>
+      </div>
+      <button
+        onClick={() => send(true)}
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-600 to-emerald-500 px-5 py-3.5 font-bold text-white shadow-lg shadow-green-900/40 transition hover:scale-[1.02]"
+      >
+        <WhatsAppIcon />
+        <span className="flex flex-col leading-tight sm:flex-row sm:gap-2">
+          <span className="font-telugu text-lg">తప్పకుండా వస్తాం</span>
+          <span className="text-base font-semibold opacity-90">We&apos;ll be there</span>
+        </span>
+      </button>
+      <button
+        onClick={() => send(false)}
+        className="mt-3 w-full rounded-full border border-cream/30 px-6 py-3 text-cream/80 transition hover:border-gold-400"
+      >
+        రాలేకపోతున్నాం · Sorry, can&apos;t make it
+      </button>
+      <p className="mt-4 text-sm text-cream/60">Opens WhatsApp to send your reply to <span className="whitespace-nowrap">{rsvp.display}</span></p>
+    </Card>
+  )
+}
+
+function WhatsAppIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+      <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3M12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4C2.7 15.6 2.2 13.8 2.2 12 2.2 6.6 6.6 2.2 12 2.2c2.6 0 5.1 1 6.9 2.9 1.8 1.8 2.9 4.3 2.9 6.9 0 5.4-4.4 9.8-9.8 9.8M20.5 3.5C18.2 1.2 15.2 0 12 0 5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.8 1 3.8 1.5 5.8 1.5 6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.4" />
+    </svg>
+  )
+}
+
+function MusicButton({ playing, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={playing ? 'Pause music' : 'Play music'}
+      className="fixed right-4 bottom-4 z-40 grid h-12 w-12 place-items-center rounded-full border border-gold-400/60 bg-maroon-900/90 text-xl text-gold-300 shadow-lg backdrop-blur"
+    >
+      {playing && <span className="absolute inset-0 rounded-full border border-gold-400 animate-pulse-ring" />}
+      {playing ? '🎵' : '🔇'}
+    </button>
+  )
+}
+
+export default function App() {
+  const [opening, setOpening] = useState(false)
+  const [showIntro, setShowIntro] = useState(true)
+  const [playing, setPlaying] = useState(false)
+  const music = useRef(null)
+  useReveal()
+
+  const open = () => {
+    try {
+      music.current = music.current || createMusic()
+      music.current.play()
+      setPlaying(true)
+    } catch {
+      setPlaying(false)
+    }
+    setOpening(true)
+    setTimeout(() => setOpening('done'), 2400)
+    setTimeout(() => setShowIntro(false), 3400)
+  }
+
+  const toggleMusic = () => {
+    music.current = music.current || createMusic()
+    if (playing) music.current.pause()
+    else music.current.play()
+    setPlaying(!playing)
+  }
+
+  useEffect(() => {
+    document.body.style.overflow = showIntro ? 'hidden' : ''
+  }, [showIntro])
+
+  return (
+    <>
+      {showIntro && <Intro onOpen={open} opening={opening} />}
+      {!showIntro || opening ? <Petals /> : null}
+      {!showIntro && <MusicButton playing={playing} onToggle={toggleMusic} />}
+
+      <main className="relative">
+        {/* Hero */}
+        <section className="relative overflow-hidden px-5 pt-20 pb-16 text-center sm:pt-24">
+          <Thoranam className="absolute top-0 left-0 h-16 w-full sm:h-20" />
+          <Garland className="absolute top-10 left-1 h-56 w-5 sm:left-6 sm:h-80 sm:w-7" />
+          <Garland className="absolute top-10 right-1 h-56 w-5 sm:right-6 sm:h-80 sm:w-7" delay={0.8} />
+
+          <div className="relative mx-auto h-56 w-56 sm:h-72 sm:w-72">
+            <div className="absolute inset-0 rounded-full bg-gold-400/20 blur-2xl animate-halo" />
+            <Rangoli className="absolute inset-0 h-full w-full opacity-70 animate-spin-slow" />
+            <Ganesha className="absolute inset-[16%] h-[68%] w-[68%] drop-shadow-[0_0_18px_rgba(245,197,66,0.5)]" />
+          </div>
+
+          <p className="mt-6 font-telugu text-2xl text-gold-300 sm:text-3xl">{blessing.te}</p>
+          <p className="mt-1 text-sm tracking-widest text-cream/70 uppercase">{blessing.en}</p>
+          <div className="mx-auto mt-4 max-w-md font-telugu text-sm leading-relaxed text-cream/80 sm:text-base">
+            {blessing.shloka.map((l) => (
+              <p key={l}>{l}</p>
+            ))}
+          </div>
+
+          <h1 className="mt-10 font-telugu text-4xl leading-normal sm:text-6xl">
+            <span className="gold-text inline-block py-2">{title.te}</span>
+          </h1>
+          <p className="mt-2 font-script text-5xl text-gold-300 sm:text-7xl">{title.en}</p>
+          <p className="mt-2 font-display text-sm tracking-[0.3em] text-cream/80 uppercase sm:text-lg">{title.subEn}</p>
+
+          <div className="mt-8 flex justify-center gap-4">
+            <Diya className="h-12 w-12 sm:h-16 sm:w-16" />
+            <Kalash className="h-20 w-16 sm:h-28 sm:w-24" />
+            <Diya className="h-12 w-12 sm:h-16 sm:w-16" delay={0.5} />
+          </div>
+        </section>
+
+        {/* Invitation */}
+        <section className="reveal px-5 pb-16">
+          <Card className="mx-auto max-w-2xl text-center">
+            <p className="font-telugu text-lg leading-loose text-cream sm:text-xl">{invitation.te}</p>
+            <div className="my-6 flex items-center justify-center gap-3">
+              <span className="h-px w-12 bg-gold-500/60" />
+              <span className="text-gold-400">❁</span>
+              <span className="h-px w-12 bg-gold-500/60" />
+            </div>
+            <p className="text-lg leading-relaxed text-cream/90 italic sm:text-xl">{invitation.en}</p>
+          </Card>
+        </section>
+
+        {/* Date + countdown */}
+        <section className="reveal px-5 pb-16">
+          <SectionTitle te="శుభ ముహూర్తం" en="The Auspicious Day" />
+          <Card className="mx-auto max-w-2xl text-center">
+            <div className="flex items-center justify-center gap-4 sm:gap-6">
+              <div className="text-right">
+                <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">Friday</p>
+                <p className="font-telugu text-sm text-cream/80 sm:text-base">శుక్రవారం</p>
+              </div>
+              <div className="relative grid h-24 w-24 place-items-center rounded-full border-2 border-gold-400 bg-maroon-950/60 sm:h-28 sm:w-28">
+                <span className="absolute inset-1 rounded-full border border-dashed border-gold-500/50 animate-spin-slow" />
+                <span className="font-serif text-6xl font-bold text-gold-400 lining-nums sm:text-7xl">20</span>
+              </div>
+              <div className="text-left">
+                <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">Nov 2026</p>
+                <p className="font-telugu text-sm text-cream/80 sm:text-base">నవంబర్ 2026</p>
+              </div>
+            </div>
+            <div className="mt-8">
+              <Countdown />
+            </div>
+            <a
+              href={calendarUrl()}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-block rounded-full border border-gold-400/60 px-6 py-2.5 text-gold-300 transition hover:bg-gold-400/10"
+            >
+              📅 <span className="font-telugu">క్యాలెండర్‌లో చేర్చండి</span>
+              <span className="block text-sm sm:ml-2 sm:inline">Add to calendar</span>
+            </a>
+          </Card>
+        </section>
+
+        {/* Schedule */}
+        <section className="reveal px-5 pb-16">
+          <SectionTitle te="కార్యక్రమ వివరాలు" en="Programme" />
+          <div className="mx-auto grid max-w-4xl gap-5 sm:grid-cols-3">
+            {schedule.map((s) => (
+              <Card key={s.en} className="text-center">
+                <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-gold-500/50 bg-maroon-950/60 text-3xl">
+                  {s.icon}
+                </div>
+                <p className="mt-4 font-serif text-3xl font-bold text-gold-400 lining-nums">{s.time}</p>
+                <p className="mt-2 font-telugu text-xl text-cream">{s.te}</p>
+                <p className="mt-1 text-lg text-cream/80">{s.en}</p>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Venue */}
+        <section className="reveal px-5 pb-16">
+          <SectionTitle te="వేదిక" en="Venue" />
+          <Card className="mx-auto max-w-3xl text-center">
+            <p className="text-3xl">🏡</p>
+            <p className="mt-3 font-telugu text-lg leading-relaxed text-cream sm:text-xl">{venue.te}</p>
+            <p className="mt-3 text-lg leading-relaxed text-cream/85">{venue.en}</p>
+            <div className="mt-6 overflow-hidden rounded-2xl border border-gold-500/40">
+              <iframe
+                title="Venue map"
+                src={`https://maps.google.com/maps?q=${venue.lat},${venue.lng}&z=16&output=embed`}
+                className="h-64 w-full sm:h-80"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+            <a
+              href={venue.mapsLink}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-block rounded-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 px-8 py-3 font-bold text-maroon-950 shadow-lg shadow-gold-500/20 transition hover:scale-105"
+            >
+              📍 దారి చూపించు · Get directions
+            </a>
+          </Card>
+        </section>
+
+        {/* Hosts */}
+        <section className="reveal px-5 pb-16">
+          <SectionTitle te={hosts.labelTe} en={hosts.labelEn} />
+          <Card className="mx-auto max-w-2xl text-center">
+            <p className="font-telugu text-2xl leading-relaxed sm:text-3xl">
+              <span className="gold-text inline-block py-1">{hosts.namesTe}</span>
+            </p>
+            <p className="mt-2 font-script text-3xl text-gold-300 sm:text-4xl">{hosts.namesEn}</p>
+            <div className="my-6 flex items-center justify-center gap-3">
+              <span className="h-px w-12 bg-gold-500/60" />
+              <span className="text-gold-400">❁</span>
+              <span className="h-px w-12 bg-gold-500/60" />
+            </div>
+            <p className="text-sm text-cream/60">
+              <span className="font-telugu text-base">{hosts.sonLabelTe}</span> · <span className="tracking-widest uppercase">{hosts.sonLabelEn}</span>
+            </p>
+            <p className="mt-2 font-telugu text-xl text-cream sm:text-2xl">{hosts.sonTe}</p>
+            <p className="mt-1 font-script text-3xl text-gold-300">{hosts.sonEn}</p>
+          </Card>
+        </section>
+
+        {/* RSVP */}
+        <section className="reveal px-5 pb-20">
+          <SectionTitle te="మీ రాకను తెలియజేయండి" en="Kindly RSVP" />
+          <Rsvp />
+        </section>
+
+        <footer className="relative overflow-hidden px-5 pt-6 pb-24 text-center">
+          <div className="flex justify-center gap-3 sm:gap-5">
+            {[0, 0.3, 0.6, 0.9, 1.2].map((d) => (
+              <Diya key={d} className="h-12 w-12 sm:h-14 sm:w-14" delay={d} />
+            ))}
+          </div>
+          <p className="mt-6 font-telugu text-xl text-gold-300 sm:text-2xl">మీ రాకకై ఎదురుచూస్తూ</p>
+          <p className="mt-1 font-script text-3xl text-cream/90 sm:text-4xl">Awaiting your gracious presence</p>
+          <p className="mt-6 text-sm text-cream/50">With love, the Paruchuri family 🙏</p>
+        </footer>
+      </main>
+    </>
+  )
+}

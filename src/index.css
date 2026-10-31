@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,500&family=Great+Vibes&family=Tiro+Telugu&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Cinzel Decorative', serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-telugu: 'Tiro Telugu', 'Noto Serif Telugu', serif;
+  --color-maroon-950: #2a0509;
+  --color-maroon-900: #4a0a12;
+  --color-maroon-800: #6b0f1a;
+  --color-maroon-700: #8a1525;
+  --color-gold-300: #fde68a;
+  --color-gold-400: #f5c542;
+  --color-gold-500: #d4a017;
+  --color-gold-600: #b8860b;
+  --color-cream: #fff8e7;
+  --color-leaf: #2f6b1f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-maroon-950);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(245, 197, 66, 0.18), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(234, 88, 12, 0.18), transparent 45%),
+    radial-gradient(circle at 100% 70%, rgba(138, 21, 37, 0.5), transparent 50%);
+  background-attachment: fixed;
+  color: var(--color-cream);
+  font-family: var(--font-serif);
+  font-variant-numeric: lining-nums;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.gold-text {
+  background: linear-gradient(100deg, #b8860b 0%, #fde68a 25%, #d4a017 50%, #fff3c4 70%, #b8860b 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: 250% center; }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scale(1, 1); opacity: 1; }
+  25% { transform: scale(0.92, 1.08); opacity: 0.9; }
+  50% { transform: scale(1.05, 0.95); opacity: 1; }
+  75% { transform: scale(0.96, 1.06); opacity: 0.85; }
+}
+
+@keyframes halo {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.08); }
+}
+
+@keyframes petal-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate3d(var(--drift, 40px), 110vh, 0) rotate(var(--spin, 540deg)); opacity: 0.9; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+.animate-sway { animation: sway 4s ease-in-out infinite; transform-origin: top center; }
+.animate-swing { animation: swing 3.2s ease-in-out infinite; transform-origin: top center; }
+.animate-flicker { animation: flicker 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+.animate-halo { animation: halo 3s ease-in-out infinite; }
+.animate-spin-slow { animation: spin 60s linear infinite; }
+.animate-spin-rev { animation: spin 90s linear infinite reverse; }
+.animate-fade-up { animation: fade-up 1s ease-out both; }
+.animate-pulse-ring { animation: pulse-ring 1.8s ease-out infinite; }
+
+.petal {
+  position: fixed;
+  top: 0;
+  pointer-events: none;
+  z-index: 40;
+  animation-name: petal-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Opening doors */
+.door-stage { perspective: 1600px; }
+.door {
+  transition: transform 2.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.door-left { transform-origin: left center; }
+.door-right { transform-origin: right center; }
+.doors-open .door-left { transform: rotateY(-100deg); }
+.doors-open .door-right { transform: rotateY(100deg); }
+
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.9s ease-out, transform 0.9s ease-out; }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
