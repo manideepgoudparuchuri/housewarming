@@ -21,7 +21,7 @@ Everything is generated from **one file: [`src/data.js`](src/data.js)**. Change 
 ## 0. One-time setup (only on a new laptop)
 
 ```bash
-brew install node ffmpeg gh                     # tools (Google Chrome must also be installed)
+brew install node gh                            # tools (Google Chrome must also be installed)
 gh auth login                                   # log in with your PERSONAL GitHub (manideepgoudparuchuri)
 git clone https://github.com/manideepgoudparuchuri/housewarming.git
 cd housewarming
@@ -89,7 +89,7 @@ https://github.com/manideepgoudparuchuri/housewarming/actions.
 npm run message
 ```
 
-Prints the message and saves it to `video-out/whatsapp-message.txt`. Copy the **TELUGU** part and/or the **ENGLISH** part into WhatsApp (the `*stars*` become **bold** in WhatsApp). Telugu times (ఉదయం / మధ్యాహ్నం / సాయంత్రం / రాత్రి) are worked out automatically.
+Prints the message, saves it to `video-out/whatsapp-message.txt` **and copies it to Downloads** as `Gruhapravesam-WhatsApp-Message.txt` (replacing the old one). Copy the **TELUGU** part and/or the **ENGLISH** part into WhatsApp (the `*stars*` become **bold** in WhatsApp). Telugu times (ఉదయం / మధ్యాహ్నం / సాయంత్రం / రాత్రి) are worked out automatically.
 
 To copy straight to the clipboard: `npm run message --silent | pbcopy`.
 
@@ -97,11 +97,14 @@ To copy straight to the clipboard: `npm run message --silent | pbcopy`.
 
 ```bash
 npm run video:preview      # optional: a few still pictures in video-out/ to check quickly
-npm run video              # full video → video-out/gruhapravesam-invitation.mp4  (~2 minutes)
-open video-out             # opens the folder in Finder
+npm run video              # full video (~2 minutes)
 ```
 
-1080×1920, about 65 seconds, ~11 MB — fits in WhatsApp. To open the video design in a browser while editing: `npm run dev`, then go to http://localhost:5173/housewarming/video.html.
+The video is saved to `video-out/gruhapravesam-invitation.mp4` **and copied to Downloads** as `Gruhapravesam-Invitation-Paruchuri.mp4` (replacing the old one).
+
+ffmpeg is needed to make the MP4. If it isn't installed, `npm run video` sets up a private copy automatically the first time (using Python, ~1 minute, saved in `~/.cache/housewarming-ffmpeg`). Installing it with `brew install ffmpeg` also works.
+
+1080×1920, about 65 seconds, ~13 MB — fits in WhatsApp. To open the video design in a browser while editing: `npm run dev`, then go to http://localhost:5173/housewarming/video.html.
 
 ## 5. (Only if the DATE or place changed) Update the link-preview picture
 
@@ -130,7 +133,7 @@ WhatsApp caches link previews for a while; to force a fresh preview send the lin
 | Problem | Fix |
 |---------|-----|
 | `git push` says **403 / permission denied** | Your work GitHub account is being used. Use `npm run deploy` (it uses your personal `gh` login), or run `unset GH_TOKEN GITHUB_TOKEN` first and `gh auth login` with the personal account. |
-| `ffmpeg not found` when making the video | `brew install ffmpeg` (or run with `FFMPEG=/path/to/ffmpeg npm run video`). |
+| `ffmpeg not found` / `Could not set up ffmpeg` | `brew install ffmpeg` (or run with `FFMPEG=/path/to/ffmpeg npm run video`). |
 | Chrome not found (video / og) | Install Google Chrome, or run with `CHROME="/path/to/chrome" npm run video`. |
 | Error mentioning `match` / `to24h` | A time in `schedule` is in the wrong format — use `'H:MM AM'` / `'H:MM PM'`. |
 | Page shows old details | Wait a minute after deploy and hard-refresh (on phone: close the tab and reopen). |

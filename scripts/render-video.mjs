@@ -1,6 +1,7 @@
 // Renders src/video (video.html) to a 1080x1920 MP4 with the temple soundtrack.
 // Usage: FFMPEG=/path/to/ffmpeg node scripts/render-video.mjs [--fps 30] [--preview]
-// Requires Google Chrome and ffmpeg (brew install ffmpeg).
+// Requires Google Chrome. Uses ffmpeg from FFMPEG / PATH (brew install ffmpeg); if none is found it
+// downloads a private copy once via Python (imageio-ffmpeg) into ~/.cache/housewarming-ffmpeg.
 import { spawn, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -10,13 +11,37 @@ import { createServer } from 'vite'
 const args = process.argv.slice(2)
 const fps = Number(args[args.indexOf('--fps') + 1]) || 30
 const preview = args.includes('--preview')
-const FFMPEG = process.env.FFMPEG || 'ffmpeg'
+const FFMPEG = preview ? null : findFfmpeg()
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const root = path.resolve(import.meta.dirname, '..')
 const outDir = path.join(root, 'video-out')
 const frames = fs.mkdtempSync(path.join(os.tmpdir(), 'hw-frames-'))
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'hw-chrome-'))
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+function findFfmpeg() {
+  if (process.env.FFMPEG) return process.env.FFMPEG
+  if (spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0) return 'ffmpeg'
+  const venv = path.join(os.homedir(), '.cache/housewarming-ffmpeg')
+  const py = path.join(venv, 'bin/python')
+  const locate = () => spawnSync(py, ['-c', 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())'], { encoding: 'utf8' })
+  let found = fs.existsSync(py) ? locate() : null
+  if (found?.status !== 0) {
+    console.log('ffmpeg not found — setting up a private copy with Python (one time, ~1 min)…')
+    const steps = [
+      ['python3', ['-m', 'venv', venv]],
+      [path.join(venv, 'bin/pip'), ['install', '-q', '--disable-pip-version-check', 'imageio-ffmpeg']],
+    ]
+    for (const [cmd, a] of steps) {
+      if (spawnSync(cmd, a, { stdio: 'inherit' }).status !== 0) {
+        console.error('Could not set up ffmpeg automatically. Install it with:  brew install ffmpeg')
+        process.exit(1)
+      }
+    }
+    found = locate()
+  }
+  return found.stdout.trim()
+}
 
 const server = await createServer({ root, server: { port: 5199, strictPort: false }, logLevel: 'error' })
 await server.listen()
@@ -99,6 +124,10 @@ if (!preview) {
   )
   if (res.status !== 0) process.exit(res.status ?? 1)
   console.log('wrote', out, `${(fs.statSync(out).size / 1e6).toFixed(1)} MB`)
+  const dl = path.join(os.homedir(), 'Downloads/Gruhapravesam-Invitation-Paruchuri.mp4')
+  fs.rmSync(dl, { force: true })
+  fs.copyFileSync(out, dl)
+  console.log('copied to', dl)
 }
 fs.rmSync(frames, { recursive: true, force: true })
 fs.rmSync(profile, { recursive: true, force: true })

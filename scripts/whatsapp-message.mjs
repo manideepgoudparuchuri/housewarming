@@ -1,6 +1,7 @@
 // Builds the WhatsApp invitation text (Telugu + English) from src/data.js.
-// Usage: npm run message   → prints it and writes video-out/whatsapp-message.txt
+// Usage: npm run message   → prints it, writes video-out/whatsapp-message.txt and copies it to ~/Downloads
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { blessing, event, hosts, invitation, schedule, site, title, to24h, venue } from '../src/data.js'
 
@@ -59,4 +60,7 @@ fs.mkdirSync(outDir, { recursive: true })
 const out = path.join(outDir, 'whatsapp-message.txt')
 fs.writeFileSync(out, text)
 console.log(text)
-console.error(`Saved → ${out}`)
+const dl = path.join(os.homedir(), 'Downloads/Gruhapravesam-WhatsApp-Message.txt')
+fs.rmSync(dl, { force: true })
+fs.copyFileSync(out, dl)
+console.error(`Saved → ${out}\nCopied → ${dl}`)
