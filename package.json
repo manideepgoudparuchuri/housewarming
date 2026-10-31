@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "video": "node scripts/render-video.mjs",
+    "video:preview": "node scripts/render-video.mjs --preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

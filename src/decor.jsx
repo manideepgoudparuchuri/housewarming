@@ -454,7 +454,7 @@ export function BrassLamp({ className = '', lit = 0 }) {
       {wicks.map(([x, y], i) => (
         <g key={i} transform={`translate(${x} ${y})`}>
           <path d="M-1.5,0 L0,-6 L1.5,0 Z" fill="#fff8e7" />
-          <g className={`flame-wrap ${lit > i ? 'is-lit' : ''}`}>
+          <g className={`flame-wrap ${lit > i ? 'is-lit' : ''}`} style={{ '--w': i }}>
             <circle cy="-16" r="14" fill="url(#lampGlow)" />
             <path
               className="animate-flicker"

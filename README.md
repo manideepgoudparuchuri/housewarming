@@ -17,6 +17,17 @@ All text, timings and venue live in [`src/data.js`](src/data.js). Edit and push 
 
 The WhatsApp link preview image is `public/og-image.jpg` (1200×630).
 
+## Invitation video
+A 56-second 1080×1920 video (for WhatsApp) is rendered from `video.html` / `src/video/Video.jsx`, using the same artwork, `src/data.js` and the music below. After changing details, re-render:
+
+```bash
+brew install ffmpeg            # once (or set FFMPEG=/path/to/ffmpeg)
+npm run video:preview          # a few still frames in video-out/
+npm run video                  # video-out/gruhapravesam-invitation.mp4
+```
+
+The video page is not part of the deployed site.
+
 ## Music credits
 Audio is in `public/audio/`, excerpted, trimmed and loudness-normalised from Wikimedia Commons recordings:
 
