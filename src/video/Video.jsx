@@ -156,7 +156,6 @@ function Chrome() {
 
 export default function Video() {
   const muhurtham = schedule[0]
-  const date = new Date(event.start)
   const [fam1, fam2] = hosts.family
   return (
     <div className="relative h-[960px] w-[540px] overflow-hidden">
@@ -204,14 +203,18 @@ export default function Video() {
         <Heading te="శుభ ముహూర్తం" en="The Auspicious Day" at={SCENES.date[0] + 0.2} />
         <Divider at={SCENES.date[0] + 0.5} />
         <Frame at={SCENES.date[0] + 0.8}>
-          <p className="font-display text-xl tracking-widest text-gold-300 uppercase">Friday</p>
-          <p className="font-telugu text-xl text-cream/85">శుక్రవారం</p>
+          <p className="font-display text-xl tracking-widest text-gold-300 uppercase">{event.weekdayEn}</p>
+          <p className="font-telugu text-xl text-cream/85">{event.weekdayTe}</p>
           <div className="relative mx-auto my-5 grid h-40 w-40 place-items-center rounded-full border-2 border-gold-400 bg-maroon-950/60" style={anim('v-zoom', 1, SCENES.date[0] + 1.5)}>
             <span className="absolute inset-1.5 rounded-full border border-dashed border-gold-500/50 animate-spin-slow" />
-            <span className="font-serif text-8xl font-bold text-gold-400 lining-nums">{date.getDate()}</span>
+            <span className="font-serif text-8xl font-bold text-gold-400 lining-nums">{event.day}</span>
           </div>
-          <p className="font-display text-xl tracking-widest text-gold-300 uppercase">November 2026</p>
-          <p className="font-telugu text-xl text-cream/85">నవంబర్ 2026</p>
+          <p className="font-display text-xl tracking-widest text-gold-300 uppercase">
+            {event.monthEn} {event.year}
+          </p>
+          <p className="font-telugu text-xl text-cream/85">
+            {event.monthTe} {event.year}
+          </p>
           <Rise at={SCENES.date[0] + 2.6} className="mt-6 rounded-2xl border border-gold-500/40 bg-maroon-950/50 px-4 py-3">
             <p className="font-telugu text-lg text-cream">
               {muhurtham.te} · <span className="font-serif font-bold text-gold-400">{muhurtham.time}</span>

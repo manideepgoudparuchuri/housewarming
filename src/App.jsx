@@ -14,6 +14,7 @@ import {
   Thoranam,
 } from './decor'
 import { createSound } from './music'
+import { GruhaScene } from './scene'
 
 function useParallax() {
   useEffect(() => {
@@ -234,30 +235,20 @@ function Intro({ onOpen, opening }) {
   )
 }
 
-function FamilyPhoto() {
+function EntryScene() {
+  const [run, setRun] = useState(0)
   return (
     <figure className="relative mx-auto max-w-3xl">
       <div className="pointer-events-none absolute -inset-6">
         <Sparkles />
       </div>
-      <div className="family-frame">
-        <div className="family-photo">
-          <img
-            src={`${import.meta.env.BASE_URL}family.jpg`}
-            alt="Illustrated portrait of the Paruchuri family"
-            width="1536"
-            height="1024"
-            loading="lazy"
-            className="family-img"
-          />
-          <div className="family-shine" />
-          <div className="curtain curtain-l" />
-          <div className="curtain curtain-r" />
-        </div>
-      </div>
+      <button type="button" onClick={() => setRun((r) => r + 1)} aria-label="Replay animation" className="scene-frame block w-full">
+        <GruhaScene key={run} className="block h-auto w-full rounded-[16px]" />
+      </button>
       <figcaption className="mt-5 text-center">
-        <p className="font-telugu text-lg text-gold-300">పరుచూరి కుటుంబం</p>
-        <p className="font-script text-3xl text-cream/90">The Paruchuri Family</p>
+        <p className="font-telugu text-lg text-gold-300">గోమాత ఆశీస్సులతో నూతన గృహప్రవేశం</p>
+        <p className="font-script text-3xl text-cream/90">With Gomata&rsquo;s blessings, we step into our new home</p>
+        <p className="mt-2 text-xs text-cream/50">Tap the picture to replay ↻</p>
       </figcaption>
     </figure>
   )
@@ -419,22 +410,26 @@ export default function App() {
           </Card>
         </section>
 
-        {/* Date + countdown */}
+        {/* Date */}
         <section className="reveal px-5 pb-16">
           <SectionTitle te="శుభ ముహూర్తం" en="The Auspicious Day" />
           <Card className="mx-auto max-w-2xl text-center">
             <div className="flex items-center justify-center gap-4 sm:gap-6">
               <div className="text-right">
-                <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">Friday</p>
-                <p className="font-telugu text-sm text-cream/80 sm:text-base">శుక్రవారం</p>
+                <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">{event.weekdayEn}</p>
+                <p className="font-telugu text-sm text-cream/80 sm:text-base">{event.weekdayTe}</p>
               </div>
               <div className="relative grid h-24 w-24 place-items-center rounded-full border-2 border-gold-400 bg-maroon-950/60 sm:h-28 sm:w-28">
                 <span className="absolute inset-1 rounded-full border border-dashed border-gold-500/50 animate-spin-slow" />
-                <span className="font-serif text-6xl font-bold text-gold-400 lining-nums sm:text-7xl">20</span>
+                <span className="font-serif text-6xl font-bold text-gold-400 lining-nums sm:text-7xl">{event.day}</span>
               </div>
               <div className="text-left">
-                <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">Nov 2026</p>
-                <p className="font-telugu text-sm text-cream/80 sm:text-base">నవంబర్ 2026</p>
+                <p className="font-display text-sm tracking-widest text-gold-300 uppercase sm:text-base">
+                  {event.monthShortEn} {event.year}
+                </p>
+                <p className="font-telugu text-sm text-cream/80 sm:text-base">
+                  {event.monthTe} {event.year}
+                </p>
               </div>
             </div>
             <a
@@ -533,10 +528,10 @@ export default function App() {
 
         <TempleBorder className="mb-10 block w-full opacity-90" />
 
-        {/* Family */}
+        {/* Gruhapravesam scene */}
         <section className="reveal px-5 pb-12">
-          <SectionTitle te="మా కుటుంబం" en="Our Family" />
-          <FamilyPhoto />
+          <SectionTitle te="శుభ గృహప్రవేశం" en="Auspicious Entry" />
+          <EntryScene />
         </section>
 
         <footer className="relative overflow-hidden px-5 pt-2 pb-24 text-center">

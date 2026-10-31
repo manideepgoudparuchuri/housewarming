@@ -140,48 +140,36 @@ body::after {
 @keyframes eq { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
 .eq-bar { transform-origin: bottom; animation: eq 0.9s ease-in-out infinite; }
 
-/* Family photo: gold arch frame, silk curtains part, slow Ken Burns + shine */
-.family-frame {
+/* Gruhapravesam scene: gold frame, doors open, Gomata walks in */
+.scene-frame {
   padding: 6px;
-  border-radius: 46% 46% 20px 20px / 26% 26% 20px 20px;
+  border-radius: 22px;
   background: linear-gradient(135deg, #8a5a0b, #fff3c4 20%, #d4a017 35%, #8a5a0b 50%, #fde68a 68%, #b8860b 85%, #fff3c4);
   box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.3), 0 0 50px rgba(245, 197, 66, 0.25), 0 20px 40px rgba(0, 0, 0, 0.45);
 }
-.family-photo {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 3 / 2;
-  border-radius: inherit;
-  background: #2a0509;
-  isolation: isolate;
-}
-.family-img { display: block; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 35%; }
-.is-visible .family-img { animation: kenburns 16s 2s ease-in-out infinite alternate; }
-@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08) translateY(1.5%); } }
-.family-shine {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(105deg, transparent 40%, rgba(255, 243, 196, 0.35) 50%, transparent 60%);
-  background-size: 250% 100%;
-  background-position: 150% 0;
-  mix-blend-mode: soft-light;
-}
-.is-visible .family-shine { animation: foil-sweep 7s 2.2s ease-in-out infinite; }
-.curtain {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 51%;
-  background:
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.25) 0 6px, transparent 6px 22px, rgba(255, 255, 255, 0.06) 22px 26px, transparent 26px 34px),
-    linear-gradient(#8a1525, #4a0a12);
-  transition: transform 1.8s 0.4s cubic-bezier(0.65, 0, 0.35, 1);
-}
-.curtain-l { left: 0; border-right: 3px solid #d4a017; }
-.curtain-r { right: 0; border-left: 3px solid #d4a017; }
-.is-visible .curtain-l { transform: translateX(-103%); }
-.is-visible .curtain-r { transform: translateX(103%); }
+.gp-walk { transform: translateX(var(--from)); }
+.gp-door-l, .gp-door-r { transform: scaleX(1); }
+.gp-text { opacity: 0; }
+.is-visible .gp-door-l, .is-visible .gp-door-r { animation: gp-door 1.8s 0.4s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+.is-visible .gp-walk { animation: gp-walk 5s 1s cubic-bezier(0.25, 0.1, 0.35, 1) forwards; }
+.is-visible .gp-calf { animation-delay: 1.3s; animation-duration: 5.4s; }
+.is-visible .gp-bob { animation: gp-bob 0.35s 1s ease-in-out 14; }
+.is-visible .gp-leg.gp-a { animation: gp-step-a 0.7s 1s linear 7; }
+.is-visible .gp-leg.gp-b { animation: gp-step-b 0.7s 1s linear 7; }
+.is-visible .gp-tail { animation: gp-tail 2.4s 1s ease-in-out infinite; }
+.is-visible .gp-head { animation: gp-nod 3.2s 6.2s ease-in-out infinite; }
+.is-visible .gp-text { animation: fade-up 1.2s 5.6s ease-out forwards; }
+.gp-glow { animation: halo 3s ease-in-out infinite; }
+.gp-leaf { animation: gp-leaf 5s ease-in-out infinite; }
+.gp-twinkle { animation: twinkle 2.6s ease-in-out infinite; }
+@keyframes gp-door { to { transform: scaleX(0.22); } }
+@keyframes gp-walk { to { transform: translateX(0); } }
+@keyframes gp-bob { 50% { transform: translateY(-2.5px); } }
+@keyframes gp-step-a { 25% { transform: rotate(14deg); } 75% { transform: rotate(-14deg); } }
+@keyframes gp-step-b { 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
+@keyframes gp-tail { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(12deg); } 60% { transform: rotate(-6deg); } }
+@keyframes gp-nod { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(6deg); } 90% { transform: rotate(-2deg); } }
+@keyframes gp-leaf { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
 
 /* Parallax driven by --sy (scrollY) */
 .parallax { transform: translate3d(0, calc(var(--sy, 0) * var(--f, 0.2) * 1px), 0); will-change: transform; }

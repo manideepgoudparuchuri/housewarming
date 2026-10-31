@@ -9,7 +9,10 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "video": "node scripts/render-video.mjs",
-    "video:preview": "node scripts/render-video.mjs --preview"
+    "video:preview": "node scripts/render-video.mjs --preview",
+    "message": "node scripts/whatsapp-message.mjs",
+    "og": "node scripts/render-og.mjs",
+    "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

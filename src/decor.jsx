@@ -69,9 +69,9 @@ export function Garland({ count = 9, className = '', delay = 0 }) {
   )
 }
 
-export function Diya({ className = '', delay = 0, lit = true, lightDelay = 0 }) {
+export function Diya({ className = '', delay = 0, lit = true, lightDelay = 0, ...rest }) {
   return (
-    <svg viewBox="0 0 80 80" className={className} aria-hidden="true">
+    <svg viewBox="0 0 80 80" className={className} aria-hidden="true" {...rest}>
       <defs>
         <radialGradient id="diyaGlow">
           <stop offset="0" stopColor="#fde68a" stopOpacity="0.9" />
@@ -108,9 +108,9 @@ export function Diya({ className = '', delay = 0, lit = true, lightDelay = 0 }) 
   )
 }
 
-export function Kalash({ className = '' }) {
+export function Kalash({ className = '', ...rest }) {
   return (
-    <svg viewBox="0 0 120 150" className={className} aria-hidden="true">
+    <svg viewBox="0 0 120 150" className={className} aria-hidden="true" {...rest}>
       <defs>
         <linearGradient id="potGrad" x1="0" x2="1">
           <stop offset="0" stopColor="#92400e" />

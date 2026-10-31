@@ -1,10 +1,81 @@
-export const event = {
-  // ISO time in IST, used for the countdown and calendar
-  start: '2026-11-20T05:30:00+05:30',
-  end: '2026-11-20T15:00:00+05:30',
-  dateEn: 'Friday, 20 November 2026',
-  dateTe: 'శుక్రవారం, 20 నవంబర్ 2026',
+// ============================================================================
+// ✏️  ALL invitation details live in this file.
+// After editing, see README.md → "Updating the invitation" for the 3 outputs
+// (website, WhatsApp text, video).
+// ============================================================================
+
+// Date of the function (YYYY-MM-DD). Weekday + month names (Telugu & English)
+// are worked out automatically from this.
+const DATE = '2026-11-20'
+
+// When the Google Calendar entry should end (24-hour clock, IST).
+const CALENDAR_END = '15:00'
+
+// Public link of the invitation website.
+export const site = {
+  url: 'https://manideepgoudparuchuri.github.io/housewarming/',
 }
+
+// Programme. The FIRST item is treated as the main muhurtham
+// (used for the calendar start time and the link preview text).
+// time format: 'H:MM AM' or 'H:MM PM'
+export const schedule = [
+  {
+    time: '5:30 AM',
+    icon: '🪔',
+    te: 'గృహప్రవేశ ముహూర్తం',
+    en: 'Gruhapravesam Muhurtham',
+  },
+  {
+    time: '7:30 AM',
+    icon: '🔥',
+    te: 'పూజ & హోమం',
+    en: 'Puja & Homam',
+  },
+  {
+    time: '11:30 AM',
+    icon: '🌺',
+    te: 'శ్రీ సత్యనారాయణ స్వామి వ్రతం',
+    en: 'Sri Satyanarayana Swamy Vratham',
+  },
+  {
+    time: '12:30 PM',
+    icon: '🍛',
+    te: 'విందు భోజనం',
+    en: 'Lunch',
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Derived from DATE + schedule – normally no need to edit below this line
+// (other than the text sections further down).
+// ---------------------------------------------------------------------------
+export function to24h(time) {
+  const [, h, m, ap] = time.trim().match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i)
+  const hour = (Number(h) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0)
+  return `${String(hour).padStart(2, '0')}:${m}`
+}
+
+const noonIST = new Date(`${DATE}T12:00:00+05:30`)
+const fmt = (locale, opts) => new Intl.DateTimeFormat(locale, { timeZone: 'Asia/Kolkata', ...opts }).format(noonIST)
+const day = Number(DATE.slice(8, 10))
+const year = Number(DATE.slice(0, 4))
+
+export const event = {
+  // ISO time in IST, used for the calendar
+  start: `${DATE}T${to24h(schedule[0].time)}:00+05:30`,
+  end: `${DATE}T${CALENDAR_END}:00+05:30`,
+  day,
+  year,
+  weekdayEn: fmt('en-IN', { weekday: 'long' }),
+  weekdayTe: fmt('te-IN', { weekday: 'long' }),
+  monthEn: fmt('en-IN', { month: 'long' }),
+  monthShortEn: fmt('en-IN', { month: 'short' }),
+  monthTe: fmt('te-IN', { month: 'long' }),
+}
+event.dateEn = `${event.weekdayEn}, ${day} ${event.monthEn} ${year}`
+event.dateShortEn = `${event.weekdayEn}, ${day} ${event.monthShortEn} ${year}`
+event.dateTe = `${event.weekdayTe}, ${day} ${event.monthTe} ${year}`
 
 export const blessing = {
   te: 'శ్రీ గణేశాయ నమః',
@@ -47,34 +118,9 @@ export const hosts = {
   ],
 }
 
-export const schedule = [
-  {
-    time: '5:30 AM',
-    icon: '🪔',
-    te: 'గృహప్రవేశ ముహూర్తం',
-    en: 'Gruhapravesam Muhurtham',
-  },
-  {
-    time: '7:30 AM',
-    icon: '🔥',
-    te: 'పూజ & హోమం',
-    en: 'Puja & Homam',
-  },
-  {
-    time: '11:30 AM',
-    icon: '🌺',
-    te: 'శ్రీ సత్యనారాయణ స్వామి వ్రతం',
-    en: 'Sri Satyanarayana Swamy Vratham',
-  },
-  {
-    time: '12:30 PM',
-    icon: '🍛',
-    te: 'విందు భోజనం',
-    en: 'Lunch',
-  },
-]
-
 export const venue = {
+  // Short place name used in the link preview
+  short: 'Kushaiguda, Hyderabad',
   te: 'ప్లాట్ నం. 61, రోడ్ నం. 6R, న్యూ వాసవి శివ నగర్ కాలనీ, అమూల్య హోమ్ దగ్గర, కుషాయిగూడ, హైదరాబాద్',
   en: 'Plot No. 61, Road No. 6R, New Vasavi Shiva Nagar Colony, Near Amulya Home, Kushaiguda, Hyderabad',
   mapsLink: 'https://maps.app.goo.gl/mmPViGkvhxxiLdKcA',
