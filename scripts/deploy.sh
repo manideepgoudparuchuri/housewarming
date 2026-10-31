@@ -26,7 +26,13 @@ git -c http.extraheader= -c http.extraheader="AUTHORIZATION: basic $AUTH" -c cre
 unset TOK AUTH
 
 echo "▶ Waiting for GitHub Pages deploy…"
-sleep 5
-RUN=$(env -u GH_TOKEN -u GITHUB_TOKEN gh run list -R "$REPO" --limit 1 --json databaseId -q '.[0].databaseId')
+SHA=$(git rev-parse HEAD)
+RUN=""
+for _ in $(seq 1 30); do
+  RUN=$(env -u GH_TOKEN -u GITHUB_TOKEN gh run list -R "$REPO" --commit "$SHA" --limit 1 --json databaseId -q '.[0].databaseId')
+  [ -n "$RUN" ] && break
+  sleep 3
+done
+[ -n "$RUN" ] || { echo "Pushed, but couldn't find the deploy run — check https://github.com/$REPO/actions"; exit 1; }
 env -u GH_TOKEN -u GITHUB_TOKEN gh run watch "$RUN" -R "$REPO" --exit-status >/dev/null
 echo "✅ Live: https://manideepgoudparuchuri.github.io/housewarming/  (hard-refresh if you still see the old page)"
